@@ -1,0 +1,43 @@
+version: "3.8"
+
+networks:
+  sandbox-net:
+    name: sandbox-net
+
+services:
+  prod:
+    image: iudx/sandbox-backend-prod:latest
+    container_name: sandbox-backend-prod
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    networks:
+      - sandbox-net
+    entrypoint: ["/bin/bash", "./scripts/entrypoint.prod.sh"]
+
+  dev:
+    image: iudx/sandbox-backend-dev:latest
+    container_name: sandbox-backend-dev
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    networks:
+      - sandbox-net
+    entrypoint: ["/bin/bash", "./scripts/entrypoint.dev.sh"]
+
+  test:
+    image: iudx/sandbox-backend-test:latest
+    container_name: sandbox-backend-test
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    networks:
+      - sandbox-net
+    entrypoint: ["/bin/bash", "./scripts/entrypoint.test.sh"]
