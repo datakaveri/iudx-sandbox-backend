@@ -1,5 +1,11 @@
 version: "3.8"
 
+volumes:
+  pg-data: 
+    name: sandbox-pg-data
+  pgadmin-data: 
+    name: sandbox-pgadmin
+
 networks:
   sandbox-net:
     name: sandbox-net
@@ -14,9 +20,10 @@ services:
       - ./:/app
     ports:
       - "${API_PORT}:${API_PORT}"
+    depends_on:
+      - pg
     networks:
       - sandbox-net
-    entrypoint: ["/bin/bash", "./scripts/entrypoint.prod.sh"]
 
   dev:
     image: iudx/sandbox-backend-dev:latest
@@ -27,9 +34,12 @@ services:
       - ./:/app
     ports:
       - "${API_PORT}:${API_PORT}"
+    depends_on:
+      - pg
+      - pgadmin
     networks:
       - sandbox-net
-    entrypoint: ["/bin/bash", "./scripts/entrypoint.dev.sh"]
+    entrypoint: ["/bin/sh", "./scripts/entrypoint.dev.sh"]
 
   test:
     image: iudx/sandbox-backend-test:latest
@@ -40,4 +50,33 @@ services:
       - ./:/app
     networks:
       - sandbox-net
-    entrypoint: ["/bin/bash", "./scripts/entrypoint.test.sh"]
+    entrypoint: ["/bin/sh", "./scripts/entrypoint.test.sh"]
+    
+  pg:
+    image: postgres
+    container_name: postgres
+    restart: on-failure
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    volumes:
+      - ./db/init_schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - pg-data:/var/lib/postgresql/data
+    networks:
+      - sandbox-net
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: on-failure
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin@123}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin-data:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks: 
+      - sandbox-net 

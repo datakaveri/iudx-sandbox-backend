@@ -36,5 +36,9 @@ func main() {
 		if err := srv.Close(); err != nil {
 			logger.Error.Println(err.Error())
 		}
+
+		if err := app.DB.Close(); err != nil {
+			logger.Error.Println(err.Error())
+		}
 	})
 }
