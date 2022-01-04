@@ -7,12 +7,13 @@ import (
 )
 
 type Config struct {
-	dbUser  string
-	dbPass  string
-	dbHost  string
-	dbPort  string
-	dbName  string
-	apiPort string
+	dbUser       string
+	dbPass       string
+	dbHost       string
+	dbPort       string
+	dbName       string
+	apiPort      string
+	binderHubApi string
 }
 
 func Get() *Config {
@@ -24,6 +25,7 @@ func Get() *Config {
 	flag.StringVar(&conf.dbPort, "dbport", os.Getenv("POSTGRES_PORT"), "DB Port")
 	flag.StringVar(&conf.dbName, "dbname", os.Getenv("POSTGRES_DB"), "DB Name")
 	flag.StringVar(&conf.apiPort, "apiPort", os.Getenv("API_PORT"), "API Port")
+	flag.StringVar(&conf.binderHubApi, "binderHubApi", os.Getenv("BINDERHUB_API"), "Binderhub Notebook Build API")
 
 	flag.Parse()
 
@@ -47,4 +49,13 @@ func (c *Config) getDBConnStr(dbhost, dbname string) string {
 
 func (c *Config) GetAPIPort() string {
 	return ":" + c.apiPort
+}
+
+func (c *Config) GetBinderNotebookBuildApi(provider, repoName string) string {
+	return fmt.Sprintf(
+		"%s/%s/%s",
+		c.binderHubApi,
+		provider,
+		repoName,
+	)
 }
