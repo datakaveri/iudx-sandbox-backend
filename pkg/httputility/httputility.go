@@ -8,22 +8,33 @@ import (
 	"time"
 )
 
-func httpClient() *http.Client {
-	client := &http.Client{Timeout: 10 * time.Second}
-	return client
+type HttpClient struct {
+	httpClient *http.Client
 }
 
-func sendRequest(client *http.Client, endpoint string, method string, data io.Reader) []byte {
+const (
+	RequestTimeout int = 30
+)
+
+func Get() *HttpClient {
+	client := &http.Client{Timeout: time.Duration(RequestTimeout) * time.Second}
+	return &HttpClient{
+		httpClient: client,
+	}
+}
+
+func (client *HttpClient) SendRequest(endpoint string, method string, data io.Reader) ([]byte, error) {
 	req, err := http.NewRequest(method, endpoint, data)
 
 	if err != nil {
 		log.Fatalf("Error Occured %+v", err)
 	}
 
-	response, err := client.Do(req)
+	response, err := client.httpClient.Do(req)
 
 	if err != nil {
 		log.Fatalf("Error sending request to API endpoint %+v", err)
+		return nil, err
 	}
 
 	defer response.Body.Close()
@@ -34,5 +45,5 @@ func sendRequest(client *http.Client, endpoint string, method string, data io.Re
 		log.Fatalf("Couldn't parse response body %+v", err)
 	}
 
-	return body
+	return body, nil
 }

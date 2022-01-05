@@ -7,13 +7,14 @@ import (
 )
 
 type Config struct {
-	dbUser       string
-	dbPass       string
-	dbHost       string
-	dbPort       string
-	dbName       string
-	apiPort      string
-	binderHubApi string
+	dbUser        string
+	dbPass        string
+	dbHost        string
+	dbPort        string
+	dbName        string
+	apiPort       string
+	binderHubApi  string
+	jupyterHubApi string
 }
 
 func Get() *Config {
@@ -26,6 +27,7 @@ func Get() *Config {
 	flag.StringVar(&conf.dbName, "dbname", os.Getenv("POSTGRES_DB"), "DB Name")
 	flag.StringVar(&conf.apiPort, "apiPort", os.Getenv("API_PORT"), "API Port")
 	flag.StringVar(&conf.binderHubApi, "binderHubApi", os.Getenv("BINDERHUB_API"), "Binderhub Notebook Build API")
+	flag.StringVar(&conf.jupyterHubApi, "jupyterHubApi", os.Getenv("JUPYTERHUB_API"), "Jupyterhub API Host")
 
 	flag.Parse()
 
@@ -58,4 +60,8 @@ func (c *Config) GetBinderNotebookBuildApi(provider, repoName string) string {
 		provider,
 		repoName,
 	)
+}
+
+func (c *Config) GetJupyterHubApi() string {
+	return c.jupyterHubApi
 }
