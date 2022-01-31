@@ -16,9 +16,9 @@ import (
 func Get(app *application.Application) *httprouter.Router {
 	mux := httprouter.New()
 
-	mux.GET("/api/gallery/", listrepo.Do(app))
+	mux.GET("/api/gallery", listrepo.Do(app))
 	mux.GET("/api/gallery/:id", getrepo.Do(app))
-	mux.POST("/api/gallery/", createrepo.Do(app))
+	mux.POST("/api/gallery", createrepo.Do(app))
 	mux.DELETE("/api/gallery/:id", deleterepo.Do(app))
 
 	mux.GET("/api/notebooks", listnotebook.Do(app))

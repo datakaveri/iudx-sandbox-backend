@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 )
 
 type Server struct {
@@ -29,7 +30,14 @@ func (s *Server) WithErrLogger(l *log.Logger) *Server {
 }
 
 func (s *Server) WithRouter(router *httprouter.Router) *Server {
-	s.srv.Handler = router
+	s.srv.Handler = cors.New(cors.Options{
+		AllowedOrigins:     []string{"*", "http://localhost:5500"},
+		AllowedMethods:     []string{"GET", "POST", "DELETE", "PUT", "OPTIONS"},
+		AllowedHeaders:     []string{"Authorization", "Content-Type", "BuildToken"},
+		AllowCredentials:   true,
+		OptionsPassthrough: true,
+		Debug:              true,
+	}).Handler(router)
 	return s
 }
 

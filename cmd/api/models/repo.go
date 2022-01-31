@@ -9,6 +9,7 @@ type Repo struct {
 	RepoName    string `json:"repoName"`
 	Description string `json:"description"`
 	GithubUrl   string `json:"githubUrl"`
+	CreatedAt   string `json:"createdAt"`
 }
 
 func (g *Repo) Create(app *application.Application) error {
@@ -56,7 +57,7 @@ func (g *Repo) Get(app *application.Application, repoName string) (Repo, error) 
 
 func (g *Repo) List(app *application.Application) ([]Repo, error) {
 	stmt := `
-		SELECT "repoName", "description", "githubUrl"
+		SELECT "repoName", "description", "githubUrl", "createdAt"
 		FROM gallery;
 	`
 
@@ -70,7 +71,7 @@ func (g *Repo) List(app *application.Application) ([]Repo, error) {
 	repos := []Repo{}
 	for rows.Next() {
 		var repo Repo
-		rows.Scan(&repo.RepoName, &repo.Description, &repo.GithubUrl)
+		rows.Scan(&repo.RepoName, &repo.Description, &repo.GithubUrl, &repo.CreatedAt)
 		repos = append(repos, repo)
 	}
 

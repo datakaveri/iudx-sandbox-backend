@@ -1,19 +1,25 @@
 package models
 
 import (
+	"database/sql"
+
 	"github.com/iudx-sandbox-backend/pkg/application"
 	"github.com/iudx-sandbox-backend/pkg/logger"
 )
 
 type Notebook struct {
-	NotebookId   string `json:"notebookId"`
-	NotebookName string `json:"name"`
-	NotebookUrl  string `json:"url"`
-	RepoName     string `json:"repoName"`
-	BuildId      string `json:"buildId"`
-	BuildStatus  string `json:"status"`
-	CreatedAt    string `json:"createdAt"`
-	LastUsed     string `json:"lastUsed"`
+	UserId       int
+	NotebookId   string         `json:"notebookId"`
+	NotebookName string         `json:"name"`
+	NotebookUrl  sql.NullString `json:"url"`
+	RepoName     string         `json:"repoName"`
+	BuildId      string         `json:"buildId"`
+	Phase        string         `json:"phase"`
+	Message      string         `json:"message"`
+	Token        sql.NullString `json:"token"`
+	ImageName    string         `json:"imageName"`
+	CreatedAt    string         `json:"createdAt"`
+	LastUsed     string         `json:"lastUsed"`
 }
 
 func (g *Notebook) Create(app *application.Application) error {
@@ -22,12 +28,13 @@ func (g *Notebook) Create(app *application.Application) error {
 			"notebookId",
 			"name",
 			"buildId",
-			"status",
+			"userId",
+			"phase"
 		)
-		VALUES ($1, $2, $3, $4);
+		VALUES ($1, $2, $3, $4, $5);
 	`
 
-	result, err := app.DB.Client.Exec(stmt, g.NotebookId, g.NotebookName, g.BuildId, g.BuildStatus)
+	result, err := app.DB.Client.Exec(stmt, g.NotebookId, g.NotebookName, g.BuildId, g.UserId, g.Phase)
 	if err != nil {
 		return err
 	}
@@ -43,7 +50,7 @@ func (g *Notebook) Create(app *application.Application) error {
 
 func (g *Notebook) List(app *application.Application) ([]Notebook, error) {
 	stmt := `
-		SELECT "notebookId", "name", "url", "buildId", "status", "createdAt", "lastUsed",
+		SELECT "notebookId", "name", "url", "buildId", "status", "createdAt", "lastUsed"
 		FROM notebook;
 	`
 
@@ -57,7 +64,7 @@ func (g *Notebook) List(app *application.Application) ([]Notebook, error) {
 	notebooks := []Notebook{}
 	for rows.Next() {
 		var notebook Notebook
-		rows.Scan(&notebook.NotebookId, &notebook.NotebookName, &notebook.NotebookUrl, &notebook.BuildId, &notebook.BuildStatus, &notebook.CreatedAt, &notebook.LastUsed)
+		rows.Scan(&notebook.NotebookId, &notebook.NotebookName, &notebook.NotebookUrl, &notebook.BuildId, &notebook.CreatedAt, &notebook.LastUsed)
 		notebooks = append(notebooks, notebook)
 	}
 
@@ -89,14 +96,14 @@ func (g *Notebook) Delete(app *application.Application, itemName string) error {
 	return nil
 }
 
-func (g *Notebook) UpdateNotebookReady(app *application.Application, buildId, status, url string) error {
+func (g *Notebook) UpdateNotebookStatus(app *application.Application) error {
 	stmt := `
 		UPDATE notebook
-		SET status = $2, url = $3
-		WHERE "buildId" = $1;
+		SET "phase" = $2, "message" = $3, "token" = $4, "imageName" = $5, "url" = $6
+		WHERE "buildId"=$1;
 	`
 
-	result, err := app.DB.Client.Exec(stmt, buildId, status, url)
+	result, err := app.DB.Client.Exec(stmt, g.BuildId, g.Phase, g.Message, g.Token, g.ImageName, g.NotebookUrl)
 	if err != nil {
 		return err
 	}
@@ -106,22 +113,22 @@ func (g *Notebook) UpdateNotebookReady(app *application.Application, buildId, st
 		return err
 	}
 
-	logger.Info.Printf("Notebook: rows deleted: %v\n", count)
+	logger.Info.Printf("Notebook: rows affected: %v\n", count)
 	return nil
 }
 
 func (g *Notebook) GetBuildStatus(app *application.Application, buildId string) (Notebook, error) {
 	stmt := `
-	SELECT "url"
-	FROM notebook 
-	WHERE "buildId" = $1;
-`
+		SELECT "url", "token", "phase"
+		FROM notebook 
+		WHERE "buildId" = $1;
+	`
 
 	notebook := Notebook{}
 
 	row := app.DB.Client.QueryRow(stmt, buildId)
 
-	err := row.Scan(&notebook.NotebookUrl)
+	err := row.Scan(&notebook.NotebookUrl, &notebook.Token, &notebook.Phase)
 	if err != nil {
 		return notebook, err
 	}

@@ -11,31 +11,20 @@ CREATE TABLE IF NOT EXISTS public.gallery
 CREATE TABLE IF NOT EXISTS public.notebook
 (
     "notebookId"    UUID            NOT NULL,
-    "url"           TEXT,
+    "userId"		INTEGER,
     "name"          TEXT,
     "buildId"       UUID,
-    "status"        TEXT            NOT NULL,
+    "phase"         TEXT,
+    "message"       TEXT,
+    "token"         TEXT,
+    "imageName"     TEXT,
+    "url"           TEXT,
     "lastUsed"      TIMESTAMPTZ     NOT NULL    DEFAULT NOW(), 
     "createdAt"     TIMESTAMPTZ     NOT NULL    DEFAULT NOW(),
     "updatedAt"     TIMESTAMPTZ     NOT NULL    DEFAULT NOW(),
     UNIQUE ("buildId"),
-    PRIMARY KEY ("notebookId")
-);
-
-CREATE TABLE IF NOT EXISTS public.buildlog
-(
-    "id"            SERIAL,
-    "buildId"       UUID            NOT NULL,
-    "phase"         TEXT,
-    "message"       TEXT,
-    "token"         TEXT,
-    "progress"      JSONB,
-    "imageName"     TEXT,
-    "url"           TEXT,
-    "createdAt"     TIMESTAMPTZ     NOT NULL    DEFAULT NOW(),
-    "updatedAt"     TIMESTAMPTZ     NOT NULL    DEFAULT NOW(),
-    PRIMARY KEY ("id")
-    CONSTRAINT "notebookFK"
-        FOREIGN KEY ("buildId") 
-        REFERENCES "notebook" ("buildId"),
+    PRIMARY KEY ("notebookId"),
+    CONSTRAINT "userFK"
+        FOREIGN KEY ("userId") 
+        REFERENCES "users" ("id")
 );

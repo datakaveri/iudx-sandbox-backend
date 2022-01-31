@@ -53,12 +53,12 @@ func (c *Config) GetAPIPort() string {
 	return ":" + c.apiPort
 }
 
-func (c *Config) GetBinderNotebookBuildApi(provider, repoName string) string {
+func (c *Config) GetBinderNotebookBuildApi(repoName string) string {
 	return fmt.Sprintf(
-		"%s/%s/%s",
+		"%s/build/gh/swarup-e/%s/HEAD",
 		c.binderHubApi,
-		provider,
 		repoName,
+		// token,
 	)
 }
 

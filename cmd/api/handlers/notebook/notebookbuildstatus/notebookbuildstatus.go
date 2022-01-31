@@ -22,7 +22,7 @@ func getBuildStatus(app *application.Application) httprouter.Handle {
 
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				w.WriteHeader(http.StatusPreconditionFailed)
+				w.WriteHeader(http.StatusNoContent)
 				logger.Info.Println("No records found")
 				return
 			}
@@ -32,7 +32,7 @@ func getBuildStatus(app *application.Application) httprouter.Handle {
 			return
 		}
 
-		if res.BuildStatus == "RUNNING" {
+		if res.Phase == "ready" {
 			w.Header().Set("Content-Type", "application/json")
 			newResponse := apiresponse.New("success", "Build completed redirect to the notebook url")
 			dataResponse := newResponse.AddData(res)
