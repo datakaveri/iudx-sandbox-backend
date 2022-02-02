@@ -9,17 +9,40 @@ import (
 
 type Notebook struct {
 	UserId       int
-	NotebookId   string         `json:"notebookId"`
-	NotebookName string         `json:"name"`
-	NotebookUrl  sql.NullString `json:"url"`
-	RepoName     string         `json:"repoName"`
-	BuildId      string         `json:"buildId"`
-	Phase        string         `json:"phase"`
-	Message      string         `json:"message"`
-	Token        sql.NullString `json:"token"`
-	ImageName    string         `json:"imageName"`
-	CreatedAt    string         `json:"createdAt"`
-	LastUsed     string         `json:"lastUsed"`
+	SpawnerId    int
+	NotebookId   string `json:"notebookId"`
+	NotebookName string `json:"name"`
+	NotebookUrl  string `json:"url"`
+	RepoName     string `json:"repoName"`
+	BuildId      string `json:"buildId"`
+	Phase        string `json:"phase"`
+	Message      string `json:"message"`
+	Token        string `json:"token"`
+	ImageName    string `json:"imageName"`
+	CreatedAt    string `json:"createdAt"`
+	LastUsed     string `json:"lastUsed"`
+}
+
+type BuildStatusResponse struct {
+	NotebookUrl sql.NullString `json:"url"`
+	BuildId     string         `json:"buildId"`
+	Phase       string         `json:"phase"`
+	Token       sql.NullString `json:"token"`
+}
+
+type NotebookResponse struct {
+	UserId       int
+	ServerId     int
+	SpawnerId    int
+	NotebookId   string
+	NotebookName string
+	NotebookUrl  string
+	RepoName     string
+	Token        string
+	Status       string
+	BuildId      string
+	CreatedAt    string
+	LastUsed     string
 }
 
 func (g *Notebook) Create(app *application.Application) error {
@@ -48,23 +71,34 @@ func (g *Notebook) Create(app *application.Application) error {
 	return nil
 }
 
-func (g *Notebook) List(app *application.Application) ([]Notebook, error) {
+func (g *Notebook) List(app *application.Application, userId int) ([]NotebookResponse, error) {
+	// TODO fetch spawner name probably useful in stop restart and delete
 	stmt := `
-		SELECT "notebookId", "name", "url", "buildId", "status", "createdAt", "lastUsed"
-		FROM notebook;
+		SELECT users."id", spawners."server_id", spawners."id", notebook."notebookId", notebook."name", notebook."repoName", notebook."url", notebook."token", notebook."buildId", notebook."createdAt", spawners."last_activity"
+		FROM spawners
+		LEFT JOIN users
+		ON users."id" = spawners."user_id"
+		LEFT JOIN notebook
+		ON notebook."userId" = users."id" AND notebook."spawnerId" = spawners."id"
+		WHERE notebook."userId" = $1;
 	`
 
-	rows, err := app.DB.Client.Query(stmt)
+	rows, err := app.DB.Client.Query(stmt, userId)
 	if err != nil {
 		return nil, err
 	}
 
 	defer rows.Close()
 
-	notebooks := []Notebook{}
+	notebooks := []NotebookResponse{}
 	for rows.Next() {
-		var notebook Notebook
-		rows.Scan(&notebook.NotebookId, &notebook.NotebookName, &notebook.NotebookUrl, &notebook.BuildId, &notebook.CreatedAt, &notebook.LastUsed)
+		var notebook NotebookResponse
+		rows.Scan(&notebook.UserId, &notebook.ServerId, &notebook.SpawnerId, &notebook.NotebookId, &notebook.NotebookName, &notebook.RepoName, &notebook.NotebookUrl, &notebook.Token, &notebook.BuildId, &notebook.CreatedAt, &notebook.LastUsed)
+		if notebook.ServerId > 0 {
+			notebook.Status = "RUNNING"
+		} else {
+			notebook.Status = "NOT RUNNING"
+		}
 		notebooks = append(notebooks, notebook)
 	}
 
@@ -99,11 +133,11 @@ func (g *Notebook) Delete(app *application.Application, itemName string) error {
 func (g *Notebook) UpdateNotebookStatus(app *application.Application) error {
 	stmt := `
 		UPDATE notebook
-		SET "phase" = $2, "message" = $3, "token" = $4, "imageName" = $5, "url" = $6
+		SET "phase" = $2, "message" = $3, "token" = $4, "imageName" = $5, "url" = $6, "spawnerId" = $7
 		WHERE "buildId"=$1;
 	`
 
-	result, err := app.DB.Client.Exec(stmt, g.BuildId, g.Phase, g.Message, g.Token, g.ImageName, g.NotebookUrl)
+	result, err := app.DB.Client.Exec(stmt, g.BuildId, g.Phase, g.Message, g.Token, g.ImageName, g.NotebookUrl, g.SpawnerId)
 	if err != nil {
 		return err
 	}
@@ -117,21 +151,21 @@ func (g *Notebook) UpdateNotebookStatus(app *application.Application) error {
 	return nil
 }
 
-func (g *Notebook) GetBuildStatus(app *application.Application, buildId string) (Notebook, error) {
+func (g *Notebook) GetBuildStatus(app *application.Application, buildId string) (BuildStatusResponse, error) {
 	stmt := `
 		SELECT "url", "token", "phase"
 		FROM notebook 
 		WHERE "buildId" = $1;
 	`
 
-	notebook := Notebook{}
+	response := BuildStatusResponse{}
 
 	row := app.DB.Client.QueryRow(stmt, buildId)
 
-	err := row.Scan(&notebook.NotebookUrl, &notebook.Token, &notebook.Phase)
+	err := row.Scan(&response.NotebookUrl, &response.Token, &response.Phase)
 	if err != nil {
-		return notebook, err
+		return response, err
 	}
 
-	return notebook, nil
+	return response, nil
 }

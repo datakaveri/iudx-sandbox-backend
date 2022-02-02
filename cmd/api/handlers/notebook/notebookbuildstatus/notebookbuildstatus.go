@@ -35,7 +35,11 @@ func getBuildStatus(app *application.Application) httprouter.Handle {
 		if res.Phase == "ready" {
 			w.Header().Set("Content-Type", "application/json")
 			newResponse := apiresponse.New("success", "Build completed redirect to the notebook url")
-			dataResponse := newResponse.AddData(res)
+			dataResponse := newResponse.AddData(map[string]string{
+				"token": res.Token.String,
+				"url":   res.NotebookUrl.String,
+				"phase": res.Phase,
+			})
 			response, _ := dataResponse.Marshal()
 			w.Write(response)
 			return

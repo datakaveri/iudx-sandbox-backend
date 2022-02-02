@@ -12,7 +12,9 @@ CREATE TABLE IF NOT EXISTS public.notebook
 (
     "notebookId"    UUID            NOT NULL,
     "userId"		INTEGER,
+    "spawnerId"     INTEGER,
     "name"          TEXT,
+    "repoName"      TEXT,
     "buildId"       UUID,
     "phase"         TEXT,
     "message"       TEXT,
@@ -26,5 +28,8 @@ CREATE TABLE IF NOT EXISTS public.notebook
     PRIMARY KEY ("notebookId"),
     CONSTRAINT "userFK"
         FOREIGN KEY ("userId") 
-        REFERENCES "users" ("id")
+        REFERENCES "users" ("id"),
+    CONSTRAINT "spawnerFK"
+        FOREIGN KEY ("spawnerId")
+        REFERENCES "spawners" ("id")
 );

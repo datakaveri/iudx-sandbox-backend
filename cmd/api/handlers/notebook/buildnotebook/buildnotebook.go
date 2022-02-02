@@ -3,6 +3,7 @@ package buildnotebook
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 
 	"github.com/google/uuid"
 	"github.com/iudx-sandbox-backend/cmd/api/models"
@@ -15,10 +16,24 @@ import (
 	"github.com/r3labs/sse/v2"
 )
 
-func handleBinderSSE(app *application.Application, msg *sse.Event, buildId string) {
+func handleBinderSSE(app *application.Application, msg *sse.Event, buildId string, userId int) {
 	notebook := &models.Notebook{}
 	json.Unmarshal(msg.Data, notebook)
 	notebook.BuildId = buildId
+
+	if notebook.Phase == "ready" {
+		parsedUrl, err := url.Parse(notebook.NotebookUrl)
+		baseUrl := parsedUrl.Path
+		if err != nil {
+			logger.Error.Printf("Error parsing url %v\n", err)
+		}
+		spawner := &models.Spawner{}
+		res, err := spawner.GetSpawnerIdBasedOnBaseUrl(app, baseUrl, userId)
+		if err != nil {
+			logger.Error.Printf("Error finding spwaner id %v\n", err)
+		}
+		notebook.SpawnerId = res.Id
+	}
 
 	if err := notebook.UpdateNotebookStatus(app); err != nil {
 		logger.Error.Printf("Binder: Error in building notebook %v\n", err)
@@ -26,11 +41,11 @@ func handleBinderSSE(app *application.Application, msg *sse.Event, buildId strin
 	}
 }
 
-func makeSseRequest(app *application.Application, buildUrl, cookie, buildId string) {
+func makeSseRequest(app *application.Application, buildUrl, cookie, buildId string, userId int) {
 	sseClient := sse.NewClient(buildUrl, CustomHeader(cookie))
 
 	sseserror := sseClient.SubscribeRaw(func(msg *sse.Event) {
-		go handleBinderSSE(app, msg, buildId)
+		go handleBinderSSE(app, msg, buildId, userId)
 	})
 
 	if sseserror != nil {
@@ -86,7 +101,7 @@ func buildNotebook(app *application.Application) httprouter.Handle {
 			return
 		}
 
-		go makeSseRequest(app, buildUrl, cookie, notebook.BuildId)
+		go makeSseRequest(app, buildUrl, cookie, notebook.BuildId, notebook.UserId)
 
 		w.Header().Set("Content-Type", "application/json")
 		newResponse := apiresponse.New("success", "Notebook Building. Please check the status")
