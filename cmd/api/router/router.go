@@ -28,7 +28,7 @@ func Get(app *application.Application) *httprouter.Router {
 	mux.POST("/api/notebooks", buildnotebook.Do(app))
 	mux.DELETE("/api/notebooks", deletenotebook.Do(app))
 	mux.GET("/api/notebooks/stop", stopnotebook.Do(app))
-	mux.GET("/api/notebooks/restart", restartnotebook.Do(app))
+	mux.GET("/api/notebooks/start", restartnotebook.Do(app))
 
 	return mux
 }
