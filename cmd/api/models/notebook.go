@@ -33,8 +33,8 @@ type BuildStatusResponse struct {
 
 type NotebookResponse struct {
 	UserId       int
-	ServerId     int
-	SpawnerId    int
+	ServerId     sql.NullInt64
+	SpawnerId    sql.NullInt64
 	SpawnerName  string
 	NotebookId   string
 	NotebookName string
@@ -94,14 +94,13 @@ func (g *Notebook) List(app *application.Application, userId int) ([]NotebookRes
 
 	notebooks := []NotebookResponse{}
 	for rows.Next() {
-		// FIXME handle null integer for spawner id
 		var notebook NotebookResponse
 		err := rows.Scan(&notebook.UserId, &notebook.ServerId, &notebook.SpawnerId, &notebook.SpawnerName, &notebook.NotebookId, &notebook.NotebookName, &notebook.RepoName, &notebook.NotebookUrl, &notebook.Token, &notebook.BuildId, &notebook.CreatedAt, &notebook.LastUsed)
 		if err != nil {
 			return nil, err
 		}
 		fmt.Println(notebook)
-		if notebook.ServerId > 0 {
+		if notebook.ServerId.Int64 > 0 {
 			notebook.Status = "RUNNING"
 		} else {
 			notebook.Status = "NOT RUNNING"
