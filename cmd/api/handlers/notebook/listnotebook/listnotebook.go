@@ -19,7 +19,7 @@ func listNotebook(app *application.Application) httprouter.Handle {
 		defer r.Body.Close()
 		tokenUser, err := authutility.ExtractTokenMetadata(r)
 		if err != nil {
-			logger.Error.Printf("Error in building notebook, Unauthorized %v\n", err)
+			logger.Error.Printf("Error in fetching notebook, Unauthorized %v\n", err)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}

@@ -7,14 +7,15 @@ import (
 )
 
 type Config struct {
-	dbUser        string
-	dbPass        string
-	dbHost        string
-	dbPort        string
-	dbName        string
-	apiPort       string
-	binderHubApi  string
-	jupyterHubApi string
+	dbUser             string
+	dbPass             string
+	dbHost             string
+	dbPort             string
+	dbName             string
+	apiPort            string
+	binderHubApi       string
+	jupyterHubApi      string
+	jupyterHubApiToken string
 }
 
 func Get() *Config {
@@ -28,6 +29,7 @@ func Get() *Config {
 	flag.StringVar(&conf.apiPort, "apiPort", os.Getenv("API_PORT"), "API Port")
 	flag.StringVar(&conf.binderHubApi, "binderHubApi", os.Getenv("BINDERHUB_API"), "Binderhub Notebook Build API")
 	flag.StringVar(&conf.jupyterHubApi, "jupyterHubApi", os.Getenv("JUPYTERHUB_API"), "Jupyterhub API Host")
+	flag.StringVar(&conf.jupyterHubApiToken, "jupyterHubApiToken", os.Getenv("JUPYTERHUB_API_TOKEN"), "Jupyterhub API Token")
 
 	flag.Parse()
 
@@ -64,4 +66,8 @@ func (c *Config) GetBinderNotebookBuildApi(repoName string) string {
 
 func (c *Config) GetJupyterHubApi() string {
 	return c.jupyterHubApi
+}
+
+func (c *Config) GetJupyterHubApiToken() string {
+	return c.jupyterHubApiToken
 }

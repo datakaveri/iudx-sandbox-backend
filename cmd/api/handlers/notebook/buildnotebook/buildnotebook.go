@@ -22,20 +22,24 @@ func handleBinderSSE(app *application.Application, msg *sse.Event, buildId strin
 	notebook.BuildId = buildId
 
 	if notebook.Phase == "ready" {
+		// FIXME slightly inconsistent approach its unreliable maybe we can change spawner name but for single server that won't work
 		parsedUrl, err := url.Parse(notebook.NotebookUrl)
-		baseUrl := parsedUrl.Path
+		baseUrl := parsedUrl.Path + "/"
 		if err != nil {
 			logger.Error.Printf("Error parsing url %v\n", err)
 		}
 		spawner := &models.Spawner{}
 		res, err := spawner.GetSpawnerIdBasedOnBaseUrl(app, baseUrl, userId)
 		if err != nil {
-			logger.Error.Printf("Error finding spwaner id %v\n", err)
+			logger.Error.Printf("Error finding spawner id %v\n", err)
 		}
 		notebook.SpawnerId = res.Id
+		if err := notebook.UpdateNotebookSpawnerId(app); err != nil {
+			logger.Error.Printf("Error failed to update spawner id %v\n", err)
+		}
 	}
 
-	if err := notebook.UpdateNotebookStatus(app); err != nil {
+	if err := notebook.UpdateNotebookBuildStatus(app); err != nil {
 		logger.Error.Printf("Binder: Error in building notebook %v\n", err)
 		return
 	}
@@ -82,6 +86,20 @@ func buildNotebook(app *application.Application) httprouter.Handle {
 
 		notebook := &models.Notebook{}
 		json.NewDecoder(r.Body).Decode(notebook)
+
+		// check if the notebook server is already present
+		notebookId, err := notebook.GetNotebookIdByRepoName(app, notebook.RepoName, user.UserId)
+
+		if notebookId != "" {
+			logger.Error.Printf("Error in building notebook, Notebook already exists %v\n", err)
+			w.Header().Set("Content-Type", "application/json")
+			newResponse := apiresponse.New("error", "Notebook already exists. Please restart or use the same")
+			response, _ := newResponse.Marshal()
+			w.WriteHeader(http.StatusConflict)
+			w.Write(response)
+			return
+		}
+
 		notebook.NotebookId = uuid.New().String()
 		notebook.BuildId = uuid.New().String()
 		notebook.UserId = user.UserId

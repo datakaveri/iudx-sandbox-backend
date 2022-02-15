@@ -23,8 +23,12 @@ func Get() *HttpClient {
 	}
 }
 
-func (client *HttpClient) SendRequest(endpoint string, method string, data io.Reader) ([]byte, error) {
+func (client *HttpClient) SendRequest(endpoint string, method string, data io.Reader, token string) ([]byte, error) {
 	req, err := http.NewRequest(method, endpoint, data)
+
+	if token != "" {
+		req.Header.Set("Authorization", token)
+	}
 
 	if err != nil {
 		log.Fatalf("Error Occured %+v", err)

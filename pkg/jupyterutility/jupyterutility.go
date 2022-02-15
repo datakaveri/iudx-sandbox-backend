@@ -1,6 +1,7 @@
 package jupyterutility
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -27,11 +28,12 @@ func Get() (*JupyterUtility, error) {
 	}, nil
 }
 
-func (client *JupyterUtility) StopServer(app *application.Application, username string) (*StopServerResponse, error) {
-	endpoint := fmt.Sprintf("%s/users/%s/server",
-		app.Cfg.GetJupyterHubApi(), username)
+func (client *JupyterUtility) StopServer(app *application.Application, username, spawnerName string) (*StopServerResponse, error) {
+	endpoint := fmt.Sprintf("%s/users/%s/servers/%s",
+		app.Cfg.GetJupyterHubApi(), username, spawnerName)
 
-	res, err := client.HttpClient.SendRequest(endpoint, "DELETE", nil)
+	token := fmt.Sprintf("Bearer %s", app.Cfg.GetJupyterHubApiToken())
+	res, err := client.HttpClient.SendRequest(endpoint, "DELETE", nil, token)
 
 	if err != nil {
 		log.Fatalf("Error stopping jupyter notebook %+v", err)
@@ -41,14 +43,38 @@ func (client *JupyterUtility) StopServer(app *application.Application, username 
 	stopServerResponse := &StopServerResponse{}
 	json.Unmarshal(res, stopServerResponse)
 
+	fmt.Println(stopServerResponse)
+
 	return stopServerResponse, nil
 }
 
-func (client *JupyterUtility) RestartServer(app *application.Application, username string) (*RestartServerResponse, error) {
-	endpoint := fmt.Sprintf("%s/users/%s/server",
-		app.Cfg.GetJupyterHubApi(), username)
+func (client *JupyterUtility) DeleteServer(app *application.Application, username, spawnerName string) (*StopServerResponse, error) {
+	endpoint := fmt.Sprintf("%s/users/%s/servers/%s",
+		app.Cfg.GetJupyterHubApi(), username, spawnerName)
 
-	res, err := client.HttpClient.SendRequest(endpoint, "POST", nil)
+	token := fmt.Sprintf("Bearer %s", app.Cfg.GetJupyterHubApiToken())
+	data := []byte(`{"remove": true }`)
+	res, err := client.HttpClient.SendRequest(endpoint, "DELETE", bytes.NewBuffer(data), token)
+
+	if err != nil {
+		log.Fatalf("Error stopping jupyter notebook %+v", err)
+		return nil, err
+	}
+
+	stopServerResponse := &StopServerResponse{}
+	json.Unmarshal(res, stopServerResponse)
+
+	fmt.Println(stopServerResponse)
+
+	return stopServerResponse, nil
+}
+
+func (client *JupyterUtility) RestartServer(app *application.Application, username, spawnerName string) (*RestartServerResponse, error) {
+	endpoint := fmt.Sprintf("%s/users/%s/servers/%s",
+		app.Cfg.GetJupyterHubApi(), username, spawnerName)
+
+	token := fmt.Sprintf("Bearer %s", app.Cfg.GetJupyterHubApiToken())
+	res, err := client.HttpClient.SendRequest(endpoint, "POST", nil, token)
 
 	if err != nil {
 		log.Fatalf("Error restarting jupyter notebook %+v", err)
