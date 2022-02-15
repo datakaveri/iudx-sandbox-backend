@@ -31,13 +31,6 @@ func deleteNotebook(app *application.Application) httprouter.Handle {
 		notebookId := queryValues.Get("notebookId")
 		notebook.NotebookId = notebookId
 
-		// Remove spawner id from notebook table
-		if err := notebook.RemoveSpawnerId(app); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			logger.Error.Printf("Error deleting notebook %v\n", err)
-			return
-		}
-
 		jupyterClient, err := jupyterutility.Get()
 
 		if err != nil {
@@ -47,6 +40,13 @@ func deleteNotebook(app *application.Application) httprouter.Handle {
 		}
 
 		spawnerName, err := notebook.GetSpawnerName(app, user.UserId, notebookId)
+
+		// Remove spawner id from notebook table
+		if err := notebook.RemoveSpawnerId(app); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			logger.Error.Printf("Error deleting notebook %v\n", err)
+			return
+		}
 
 		_, err = jupyterClient.DeleteServer(app, tokenUser.UserName, spawnerName)
 

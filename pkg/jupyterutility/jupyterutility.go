@@ -14,6 +14,10 @@ type JupyterUtility struct {
 	HttpClient *httputility.HttpClient
 }
 
+type DeleteServerResponse struct {
+	Message string `json:"message"`
+}
+
 type StopServerResponse struct {
 	Message string `json:"message"`
 }
@@ -48,9 +52,11 @@ func (client *JupyterUtility) StopServer(app *application.Application, username,
 	return stopServerResponse, nil
 }
 
-func (client *JupyterUtility) DeleteServer(app *application.Application, username, spawnerName string) (*StopServerResponse, error) {
+func (client *JupyterUtility) DeleteServer(app *application.Application, username, spawnerName string) (*DeleteServerResponse, error) {
 	endpoint := fmt.Sprintf("%s/users/%s/servers/%s",
 		app.Cfg.GetJupyterHubApi(), username, spawnerName)
+
+	fmt.Println(endpoint)
 
 	token := fmt.Sprintf("Bearer %s", app.Cfg.GetJupyterHubApiToken())
 	data := []byte(`{"remove": true }`)
@@ -61,12 +67,12 @@ func (client *JupyterUtility) DeleteServer(app *application.Application, usernam
 		return nil, err
 	}
 
-	stopServerResponse := &StopServerResponse{}
-	json.Unmarshal(res, stopServerResponse)
+	deleteServerResponse := &DeleteServerResponse{}
+	json.Unmarshal(res, deleteServerResponse)
 
-	fmt.Println(stopServerResponse)
+	fmt.Println(deleteServerResponse)
 
-	return stopServerResponse, nil
+	return deleteServerResponse, nil
 }
 
 func (client *JupyterUtility) RestartServer(app *application.Application, username, spawnerName string) (*RestartServerResponse, error) {
