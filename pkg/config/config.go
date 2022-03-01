@@ -57,7 +57,7 @@ func (c *Config) GetAPIPort() string {
 
 func (c *Config) GetBinderNotebookBuildApi(repoName string) string {
 	return fmt.Sprintf(
-		"%s/build/gh/swarup-e/%s/HEAD",
+		"%s/build/gh/datakaveri/%s/HEAD",
 		c.binderHubApi,
 		repoName,
 		// token,
