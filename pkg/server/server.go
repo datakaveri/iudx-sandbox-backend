@@ -31,9 +31,9 @@ func (s *Server) WithErrLogger(l *log.Logger) *Server {
 
 func (s *Server) WithRouter(router *httprouter.Router) *Server {
 	s.srv.Handler = cors.New(cors.Options{
-		// AllowedOrigins:     []string{"http://localhost:4500", "https://sandbox.iudx.io", "*"},
+		AllowedOrigins:     []string{"http://localhost:4500", "*"},
 		AllowedMethods:     []string{"GET", "POST", "DELETE", "PUT", "OPTIONS"},
-		AllowedHeaders:     []string{"Authorization", "Content-Type", "BuildToken"},
+		AllowedHeaders:     []string{"Authorization", "Content-Type", "BuildToken", "token"},
 		AllowCredentials:   true,
 		OptionsPassthrough: true,
 		Debug:              true,
