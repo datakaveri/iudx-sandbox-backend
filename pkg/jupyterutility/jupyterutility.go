@@ -75,7 +75,7 @@ func (client *JupyterUtility) DeleteServer(app *application.Application, usernam
 	return deleteServerResponse, nil
 }
 
-func (client *JupyterUtility) RestartServer(app *application.Application, username, spawnerName string) (*RestartServerResponse, error) {
+func (client *JupyterUtility) RestartServer(app *application.Application, username, spawnerName string) (*RestartServerResponse, string, error) {
 	endpoint := fmt.Sprintf("%s/users/%s/servers/%s",
 		app.Cfg.GetJupyterHubApi(), username, spawnerName)
 
@@ -84,11 +84,11 @@ func (client *JupyterUtility) RestartServer(app *application.Application, userna
 
 	if err != nil {
 		log.Fatalf("Error restarting jupyter notebook %+v", err)
-		return nil, err
+		return nil, "", err
 	}
 
 	restartServerResponse := &RestartServerResponse{}
 	json.Unmarshal(res, restartServerResponse)
 
-	return restartServerResponse, nil
+	return restartServerResponse, endpoint, nil
 }

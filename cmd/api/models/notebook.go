@@ -74,6 +74,25 @@ func (g *Notebook) Create(app *application.Application) error {
 	return nil
 }
 
+func (g *Notebook) Get(app *application.Application, notebookId string) (Notebook, error) {
+	stmt := `
+		SELECT "buildId", "notebookId", "spawnerId", "userId", "url"
+		FROM notebook 
+		WHERE "notebookId" = $1;
+	`
+
+	notebook := Notebook{}
+
+	row := app.DB.Client.QueryRow(stmt, notebookId)
+
+	err := row.Scan(&notebook.BuildId, &notebook.NotebookId, &notebook.SpawnerId, &notebook.UserId, &notebook.NotebookUrl)
+	if err != nil {
+		return notebook, err
+	}
+
+	return notebook, nil
+}
+
 func (g *Notebook) List(app *application.Application, userId int) ([]NotebookResponse, error) {
 	stmt := `
 		SELECT users."id", spawners."server_id", spawners."id", spawners."name", notebook."notebookId", notebook."name", notebook."repoName", notebook."url", notebook."token", notebook."buildId", notebook."createdAt", spawners."last_activity"

@@ -36,7 +36,7 @@ func (s *Server) WithRouter(router *httprouter.Router) *Server {
 		AllowedHeaders:     []string{"Authorization", "Content-Type", "BuildToken", "token"},
 		AllowCredentials:   true,
 		OptionsPassthrough: true,
-		Debug:              true,
+		// Debug:              true,
 	}).Handler(router)
 	return s
 }

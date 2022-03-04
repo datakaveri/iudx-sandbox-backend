@@ -2,7 +2,9 @@ package restartnotebook
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/iudx-sandbox-backend/cmd/api/models"
@@ -13,7 +15,69 @@ import (
 	"github.com/iudx-sandbox-backend/pkg/logger"
 	"github.com/iudx-sandbox-backend/pkg/middleware"
 	"github.com/julienschmidt/httprouter"
+	"github.com/r3labs/sse/v2"
 )
+
+type RestartProgressResponse struct {
+	Ready   bool   `json:"ready"`
+	Message string `json:"message"`
+	Url     string `json:"url"`
+}
+
+func handleJupyterSSE(app *application.Application, msg *sse.Event, notebook *models.Notebook) {
+	response := &RestartProgressResponse{}
+	json.Unmarshal(msg.Data, response)
+	fmt.Println(response)
+
+	if response.Ready == true {
+		// FIXME slightly inconsistent approach its unreliable maybe we can change spawner name but for single server that won't work
+		spawner := &models.Spawner{}
+		res, err := spawner.GetSpawnerIdBasedOnBaseUrl(app, response.Url, notebook.UserId)
+		if err != nil {
+			logger.Error.Printf("Error finding spawner id %v\n", err)
+		}
+		notebook.SpawnerId = res.Id
+		if err := notebook.UpdateNotebookSpawnerId(app); err != nil {
+			logger.Error.Printf("Error failed to update spawner id %v\n", err)
+		}
+
+		notebook.Phase = "ready"
+
+		if err := notebook.UpdateNotebookStatus(app); err != nil {
+			logger.Error.Printf("Binder: Error in restarting notebook %v\n", err)
+			return
+		}
+		return
+	}
+
+	notebook.Phase = "restarting"
+
+	if err := notebook.UpdateNotebookStatus(app); err != nil {
+		logger.Error.Printf("Binder: Error in restarting notebook %v\n", err)
+		return
+	}
+}
+
+func makeSseRequest(app *application.Application, progressUrl string, notebook *models.Notebook) {
+	fmt.Println("Making restart request", progressUrl)
+	sseClient := sse.NewClient(progressUrl, CustomHeader(app))
+
+	sseserror := sseClient.SubscribeRaw(func(msg *sse.Event) {
+		go handleJupyterSSE(app, msg, notebook)
+	})
+
+	if sseserror != nil {
+		logger.Error.Printf("Error in sse %v\n", sseserror)
+	}
+}
+
+func CustomHeader(app *application.Application) func(c *sse.Client) {
+	return func(c *sse.Client) {
+		c.Headers = map[string]string{
+			"Authorization": fmt.Sprintf("Bearer %s", app.Cfg.GetJupyterHubApiToken()),
+		}
+	}
+}
 
 func restartNotebook(app *application.Application) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -41,17 +105,27 @@ func restartNotebook(app *application.Application) httprouter.Handle {
 			return
 		}
 
-		spawnerName, err := notebook.GetSpawnerName(app, user.UserId, notebookId)
-
-		_, err = jupyterClient.RestartServer(app, tokenUser.UserName, spawnerName)
+		notebookData, err := notebook.Get(app, notebook.NotebookId)
 
 		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			logger.Error.Println("No notebook found", err)
+			return
+		}
+
+		spawnerName, err := notebook.GetSpawnerName(app, user.UserId, notebookId)
+
+		_, endpoint, err := jupyterClient.RestartServer(app, tokenUser.UserName, spawnerName)
+
+		if err != nil || endpoint == "" {
 			w.WriteHeader(http.StatusInternalServerError)
 			logger.Error.Println("Jupyter client failure", err)
 			return
 		}
 
-		notebook.Phase = "ready"
+		go makeSseRequest(app, fmt.Sprintf("%s/progress", endpoint), &notebookData)
+
+		notebook.Phase = "restarting"
 		err = notebook.UpdateNotebookStatus(app)
 
 		if err != nil {
