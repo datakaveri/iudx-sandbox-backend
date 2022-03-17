@@ -46,8 +46,13 @@ func getBuildStatus(app *application.Application) httprouter.Handle {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
 		newResponse := apiresponse.New("pending", "Notebook Build In Progress")
+		if res.Phase != "" {
+			newResponse = apiresponse.New(res.Phase, "Notebook Status")
+		}
+		if res.Phase == "failed" {
+			newResponse = apiresponse.New(res.Phase, res.Message.String)
+		}
 		response, _ := newResponse.Marshal()
 		w.Write(response)
 	}

@@ -95,7 +95,7 @@ func buildNotebook(app *application.Application) httprouter.Handle {
 			w.Header().Set("Content-Type", "application/json")
 			newResponse := apiresponse.New("error", "Notebook already exists. Please restart or use the same")
 			response, _ := newResponse.Marshal()
-			w.WriteHeader(http.StatusConflict)
+			w.WriteHeader(http.StatusInternalServerError)
 			w.Write(response)
 			return
 		}

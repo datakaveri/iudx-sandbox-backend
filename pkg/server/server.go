@@ -29,15 +29,20 @@ func (s *Server) WithErrLogger(l *log.Logger) *Server {
 	return s
 }
 
-func (s *Server) WithRouter(router *httprouter.Router) *Server {
-	s.srv.Handler = cors.New(cors.Options{
-		AllowedOrigins:     []string{"http://localhost:4500", "*"},
-		AllowedMethods:     []string{"GET", "POST", "DELETE", "PUT", "OPTIONS"},
-		AllowedHeaders:     []string{"Authorization", "Content-Type", "BuildToken", "token"},
-		AllowCredentials:   true,
-		OptionsPassthrough: true,
-		// Debug:              true,
-	}).Handler(router)
+func (s *Server) WithRouter(environment string, router *httprouter.Router) *Server {
+	if environment != "prod" {
+		s.srv.Handler = cors.New(cors.Options{
+			AllowedOrigins:     []string{"http://localhost:4500", "*"},
+			AllowedMethods:     []string{"GET", "POST", "DELETE", "PUT", "OPTIONS"},
+			AllowedHeaders:     []string{"Authorization", "Content-Type", "BuildToken", "token"},
+			AllowCredentials:   true,
+			OptionsPassthrough: true,
+			Debug:              true,
+		}).Handler(router)
+	} else {
+		s.srv.Handler = router
+	}
+
 	return s
 }
 

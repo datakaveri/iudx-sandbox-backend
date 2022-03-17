@@ -29,6 +29,7 @@ type BuildStatusResponse struct {
 	BuildId     string         `json:"buildId"`
 	Phase       string         `json:"phase"`
 	Token       sql.NullString `json:"token"`
+	Message     sql.NullString `json:"message"`
 }
 
 type NotebookResponse struct {
@@ -199,7 +200,7 @@ func (g *Notebook) UpdateNotebookSpawnerId(app *application.Application) error {
 
 func (g *Notebook) GetBuildStatus(app *application.Application, buildId string) (BuildStatusResponse, error) {
 	stmt := `
-		SELECT "url", "token", "phase"
+		SELECT "url", "token", "phase", "message"
 		FROM notebook 
 		WHERE "buildId" = $1;
 	`
@@ -208,7 +209,7 @@ func (g *Notebook) GetBuildStatus(app *application.Application, buildId string) 
 
 	row := app.DB.Client.QueryRow(stmt, buildId)
 
-	err := row.Scan(&response.NotebookUrl, &response.Token, &response.Phase)
+	err := row.Scan(&response.NotebookUrl, &response.Token, &response.Phase, &response.Message)
 	if err != nil {
 		return response, err
 	}
@@ -241,7 +242,7 @@ func (g *Notebook) GetNotebookIdByRepoName(app *application.Application, repoNam
 	stmt := `
 		SELECT "notebookId"
 		FROM notebook
-		WHERE notebook."repoName" = $1 AND notebook."userId" = $2;
+		WHERE notebook."repoName" = $1 AND notebook."userId" = $2 AND notebook."phase" != "failed";
 	`
 
 	notebook := NotebookResponse{}

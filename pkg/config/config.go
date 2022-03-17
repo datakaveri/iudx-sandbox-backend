@@ -7,20 +7,23 @@ import (
 )
 
 type Config struct {
-	dbUser             string
-	dbPass             string
-	dbHost             string
-	dbPort             string
-	dbName             string
-	apiPort            string
-	binderHubApi       string
-	jupyterHubApi      string
-	jupyterHubApiToken string
+	environment               string
+	dbUser                    string
+	dbPass                    string
+	dbHost                    string
+	dbPort                    string
+	dbName                    string
+	apiPort                   string
+	binderHubApi              string
+	jupyterHubApi             string
+	jupyterHubApiToken        string
+	keycloakPublicCertificate string
 }
 
 func Get() *Config {
 	conf := &Config{}
 
+	flag.StringVar(&conf.environment, "environment", os.Getenv("GO_ENV"), "Hosted environment")
 	flag.StringVar(&conf.dbUser, "dbuser", os.Getenv("POSTGRES_USER"), "DB User Name")
 	flag.StringVar(&conf.dbPass, "dbpass", os.Getenv("POSTGRES_PASSWORD"), "DB Password")
 	flag.StringVar(&conf.dbHost, "dbhost", os.Getenv("POSTGRES_HOST"), "DB Host")
@@ -30,6 +33,7 @@ func Get() *Config {
 	flag.StringVar(&conf.binderHubApi, "binderHubApi", os.Getenv("BINDERHUB_API"), "Binderhub Notebook Build API")
 	flag.StringVar(&conf.jupyterHubApi, "jupyterHubApi", os.Getenv("JUPYTERHUB_API"), "Jupyterhub API Host")
 	flag.StringVar(&conf.jupyterHubApiToken, "jupyterHubApiToken", os.Getenv("JUPYTERHUB_API_TOKEN"), "Jupyterhub API Token")
+	flag.StringVar(&conf.keycloakPublicCertificate, "keycloakPublicCertificate", os.Getenv("KEYCLOAK_PUBLIC_KEY"), "Keycloak Certificate Value excluding ")
 
 	flag.Parse()
 
@@ -70,4 +74,14 @@ func (c *Config) GetJupyterHubApi() string {
 
 func (c *Config) GetJupyterHubApiToken() string {
 	return c.jupyterHubApiToken
+}
+
+func (c *Config) GetEnvironment() string {
+	return c.environment
+}
+
+func (c *Config) GetKeycloakPublicCertificate() string {
+	return "-----BEGIN CERTIFICATE-----\n" +
+		c.keycloakPublicCertificate +
+		"\n-----END CERTIFICATE-----"
 }
