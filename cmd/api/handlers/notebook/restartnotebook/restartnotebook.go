@@ -142,7 +142,10 @@ func restartNotebook(app *application.Application) httprouter.Handle {
 
 		w.Header().Set("Content-Type", "application/json")
 		newResponse := apiresponse.New("success", "Notebook starting")
-		response, _ := newResponse.Marshal()
+		dataResponse := newResponse.AddData(map[string]string{
+			"buildId": notebook.BuildId,
+		})
+		response, _ := dataResponse.Marshal()
 		w.Write(response)
 	}
 }
