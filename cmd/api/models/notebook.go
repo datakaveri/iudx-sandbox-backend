@@ -242,7 +242,7 @@ func (g *Notebook) GetNotebookIdByRepoName(app *application.Application, repoNam
 	stmt := `
 		SELECT "notebookId"
 		FROM notebook
-		WHERE notebook."repoName" = $1 AND notebook."userId" = $2 AND notebook."phase" != "failed";
+		WHERE notebook."repoName" = $1 AND notebook."userId" = $2 AND notebook."phase" != 'failed';
 	`
 
 	notebook := NotebookResponse{}
