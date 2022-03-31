@@ -3,3 +3,7 @@ main
 .env
 
 coverage.out
+
+./temp
+
+./sandboxes/

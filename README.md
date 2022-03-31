@@ -1,39 +1,18 @@
 
 # iudx-sandbox-backend
+The IUDX Sandbox is a JupyterHub based platform where users of IUDX can 
+1. Download sample historical data for datasets
+2. Explore IUDX curated notebooks of interesting use cases
+3. Interactively perform data analytics on these IUDX live/historical datasets
 
-## Get Started
+The architecture of the backend system is as shown below
+<p align="center">
+<img src="./docs/images/arch.png" width="600">
+</p>
 
-### Prerequisite - Make configuration
+The sandbox can be accessed [here](https://sandbox.iudx.org.in).
 
-Create a `.env` file in the root directory of the project based on the template given below:
-
-```sh
-# Server config
-API_PORT=8080
-
-# DB config
-POSTGRES_USER=user
-POSTGRES_PASSWORD=user123
-POSTGRES_HOST=pg
-POSTGRES_PORT=5432
-POSTGRES_DB=sandbox_db
-```
-
-### Docker based
-
-1. Install docker and docker-compose.
-2. Clone this repo.
-3. Build the images
-   `./docker/build.sh`
-4. Modify the `docker-compose.yml` file to map the config file you just created.
-5. Start the server in production (prod) or development (dev) mode using docker-compose
-   ` docker-compose up prod `
-
-To bring down all the services, run `docker-compose down`
-
-### Testing
-
-### Unit tests
-
-Run the tests through docker using docker-compose
-   ` docker-compose up test `
+## Setup
+- [Setup the JupyterHub backend](./setup/jupyterhub)
+- [Setup the application backend](./docs/backend_setup.md)
+- [Load applications into the system](./docs/onboard.md)
