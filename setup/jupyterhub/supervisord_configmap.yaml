@@ -1,0 +1,18 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: supervisord-config
+data:
+  supervisord.conf: |-
+    [supervisord]
+    logfile=/tmp/logs/supervisord.log
+    pidfile=/tmp/logs/supervisord.pid
+    nodaemon=false
+
+
+    [program:scheduler_python]
+    command=/srv/conda/envs/notebook/bin/python /tmp/scheduler_script.py
+    autostart=true
+    autorestart=true
+    stderr_logfile=/tmp/logs/scheduler_err.log
+    stdout_logfile=/tmp/logs/scheduler.log

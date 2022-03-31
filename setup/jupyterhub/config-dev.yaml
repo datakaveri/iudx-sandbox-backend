@@ -1,0 +1,256 @@
+replicas: 1
+config:
+  BinderHub:
+    use_registry: false
+    image_prefix: "local/prefix-"
+    hub_url: http://10.105.252.99
+    auth_enabled: true
+    cors_allow_origin: "*"
+    template_path: /etc/binderhub/custom/templates
+    extra_static_path: /etc/binderhub/custom/static
+    extra_static_url_prefix: /extra_static/
+    template_variables:
+      EXTRA_STATIC_URL_PREFIX: "/extra_static/"
+    appendix: RUN pip install tqdm fastparquet pandas numpy statsmodels scikit-learn scipy folium geojsoncontour seaborn ipywidgets plotly h3 datetime keplergl supervisor voila ipyvuetify voila-vuetify bqplot matplotlib git+https://github.com/datakaveri/iudx-python-sdk
+  GithubRepoProvider:
+    # Add banned repositories to the list below
+    # They should be strings that will match "^<org-name>/<repo-name>.*"
+    banned_specs:
+      - ^((?!datakaveri).)*$
+
+# branch will be selected based on development if using this for prod then main, for local development it is localhost
+initContainers:
+  - name: git-clone-templates
+    image: alpine/git
+    args:
+      - clone
+      - --single-branch
+      - --branch=localhost
+      - --depth=1
+      - --
+      - https://github.com/swarup-e/binder-custom-ui
+      - /etc/binderhub/custom
+    securityContext:
+      runAsUser: 0
+    volumeMounts:
+      - name: custom-templates
+        mountPath: /etc/binderhub/custom
+
+extraVolumes:
+  - name: custom-templates
+    emptyDir: {}
+extraVolumeMounts:
+  - name: custom-templates
+    mountPath: /etc/binderhub/custom
+
+jupyterhub:
+  custom:
+    binderauth_enabled: true
+    mount_all_projects: true
+    default_project:
+      repo_url: "https://github.com/swarup-e/iudx-playground-example"
+      ref: "main"
+  cull:
+    users: false
+
+  hub:
+    extraVolumes:
+      - name: persistent-bhub-config
+        configMap:
+          name: persistent-bhub-config
+    extraVolumeMounts:
+      - name: persistent-bhub-config
+        mountPath: /usr/local/etc/jupyterhub/persistent_bhub_config.py
+        subPath: persistent_bhub_config.py
+
+    redirectToServer: false
+    allowNamedServers: true
+    namedServerLimitPerUser: 10
+    config:
+      BinderSpawner:
+        auth_enabled: true
+        cors_allow_origin: "*"
+      GenericOAuthenticator:
+        auto_login: true
+        enable_auth_state: true
+        authorize_url: https://identitydev.iudx.io/auth/realms/demo/protocol/openid-connect/auth
+        client_id: angular-iudx-client
+        login_service: keycloak
+        oauth_callback_url: http://10.105.252.99/hub/oauth_callback #update the host with jupyterhub url (proxy-public in case of dev)
+        token_url: https://identitydev.iudx.io/auth/realms/demo/protocol/openid-connect/token
+        userdata_params:
+          state: state
+        userdata_url: https://identitydev.iudx.io/auth/realms/demo/protocol/openid-connect/userinfo
+        username_key: preferred_username
+        scope:
+          - openid 
+          - offline_access
+        admin_users:
+          - adminuser1
+      JupyterHub:
+        # hub_routespec: "/hub/api"
+        authenticator_class: oauthenticator.generic.GenericOAuthenticator
+
+    extraConfig:
+      authpasstoken: |
+        from oauthenticator.generic import GenericOAuthenticator
+        from tornado import gen
+        import time
+
+        class CustomKeycloakAuthenticator(GenericOAuthenticator):
+          @staticmethod
+          def _create_auth_state(token_response, user_data_response):
+            access_token = token_response['access_token']
+            refresh_token = token_response.get('refresh_token', None)
+            scope = token_response.get('scope', '')
+            if isinstance(scope, str):
+              scope = scope.split(' ')
+
+            try:
+              expires_in = int(token_response.get('expires_in'))
+              expires_at = time.time() + expires_in  # seconds
+            except (KeyError, TypeError):
+              expires_at = None
+
+            return {
+              'access_token': access_token,
+              'refresh_token': refresh_token,
+              'oauth_user': user_data_response,
+              'scope': scope,
+              'expires_at': expires_at,
+            }
+
+          async def refresh_user(self, user, handler=None):
+            # Retrieve user authentication info and check if refresh is needed
+            auth_state = await user.get_auth_state()
+            expires_at = auth_state.get('expires_at', None)
+            refresh_token = auth_state.get('refresh_token', None)
+
+            # If no refresh_token, return success
+            if not refresh_token:
+              return True
+
+            # If no expiration, return success
+            if not expires_at:
+              return True
+
+            if time.time() > expires_at:
+              return False
+
+            # If over 2x auth_refresh_age intervals from expiration, return success
+            if (time.time() + 2 * self.auth_refresh_age) < expires_at:
+              return True
+
+            self.log.info('Refreshing tokens for user %s', user.name)
+
+            # Attempt renewal
+            params = dict(
+              client_id=self.client_id,
+              client_secret=self.client_secret,
+              refresh_token=refresh_token,
+              grant_type='refresh_token',
+            )
+
+            headers = { "Content-Type": "application/x-www-form-urlencoded" }
+
+            token_resp_json = await self._get_token(headers, params)
+            user_data_resp_json = await self._get_user_data(token_resp_json)
+
+            user_info = {
+              'auth_state': self._create_auth_state(token_resp_json, user_data_resp_json),
+            }
+
+            return user_info
+
+          @gen.coroutine
+          def pre_spawn_start(self, user, spawner):
+            auth_state = yield user.get_auth_state()
+            if not auth_state:
+              return
+            print(auth_state)
+            spawner.environment['KC_ACCESS_TOKEN'] = auth_state['access_token']
+            spawner.environment['KC_REFRESH_TOKEN'] = auth_state['refresh_token']
+        c.JupyterHub.authenticator_class = CustomKeycloakAuthenticator
+        c.Authenticator.enable_auth_state = True
+        c.Authenticator.refresh_pre_spawn = True
+      
+      00-binder: |
+        from persistent_bhub_config import PersistentBinderSpawner
+        c.JupyterHub.spawner_class = PersistentBinderSpawner
+
+    services:
+      binder:
+        oauth_no_confirm: true
+        oauth_redirect_uri: http://localhost:3002/oauth_callback # update the host with binderhub url 
+        oauth_client_id: "playground-client"
+        admin: true
+    db:
+      type: postgres
+      url: postgresql+psycopg2://iudx:iudx123@host.minikube.internal:5432/sandbox_db
+      password: iudx123
+
+  singleuser:
+    cmd: "jupyterhub-singleuser" 
+    defaultUrl: "/lab"
+    podNameTemplate: "pod-{userid}-{servername}"
+    extraEnv:
+      JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
+    storage:
+      type: dynamic
+      capacity: 3Gi
+      dynamic:
+        storageClass: standard
+        pvcNameTemplate: "jpvc-{userid}-{servername}"
+        volumeNameTemplate: "jvlm-{userid}-{servername}"
+      extraVolumes:
+        - name: scheduler-script
+          configMap:
+            name: scheduler-script
+        - name: supervisord-config
+          configMap:
+            name: supervisord-config
+        - name: jupyter-config
+          configMap:
+            name: jupyter-config
+      extraVolumeMounts:
+        - name: scheduler-script
+          mountPath: /tmp/scheduler_script.py
+          subPath: scheduler_script.py
+        - name: supervisord-config
+          mountPath: /tmp/supervisord.conf
+          subPath: supervisord.conf
+        - name: jupyter-config
+          mountPath: /tmp/jupyter_config.json
+          subPath: jupyter_config.json
+
+    lifecycleHooks:
+      postStart:
+        exec:
+          command:
+            - "sh"
+            - "-c"
+            - >
+              mkdir /tmp/logs;
+              supervisord -c /tmp/supervisord.conf;
+              jupyter constrib nbextension install --user;
+              jupyter nbextension enable --py widgetsnbextension;
+              jupyter server extension enable voila;
+              jupyter trust $HOME/*.ipynb
+              
+  prePuller:
+    hook:
+      enabled: false
+    continuous:
+      enabled: false
+
+extraConfig:
+  10-repo-providers: |
+    from binderhub.repoproviders import GitHubRepoProvider
+    c.BinderHub.repo_providers = {
+        'gh': GitHubRepoProvider,
+    }
+  custom_options: |
+    import os
+    import json
+    os.environ['JUPYTERHUB_COOKIE_OPTIONS'] = json.dumps({'httponly': False})
+    print("loaded")

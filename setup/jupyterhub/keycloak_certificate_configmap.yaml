@@ -1,0 +1,15 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: keycloak-certificate
+data:
+  keycloak_certificate.crt: |-
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqLV/ZYrzUkHEWXG7CmyO
+    GPrCzfYs9thsOuwY7apxed75vEeujTayjDh0xbQj4t9/mjdqpzcJFHECeJZ+v5m2
+    1pGkscLmfnAnFbOerSUQU522vtrT6Zld+Us8H0csI7N4DVV+Jq3jgEzU6InmRQkB
+    CaID71bD2sqRUKhQykGQJ0rRr24GLylCdBVjvoaVJ7PSTnA7zOxFZnhv4/3QO1X6
+    2xyW6gAWilLLjy+3rd/vqLT8yL2J/vAek/XbAYUXzlndTvmyRp/BV/dtxEsawshn
+    TkYRGiOnWhX4evShvhrIbZSutPUCZraXb9B9LZo07C38XlLaXZEUIV9Rmq/ea7N/
+    fwIDAQAB
+    -----END PUBLIC KEY-----

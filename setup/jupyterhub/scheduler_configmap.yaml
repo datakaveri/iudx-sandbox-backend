@@ -1,0 +1,42 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: scheduler-script
+data:
+  scheduler_script.py: |-
+    #!/usr/bin/env python3
+
+    import os
+    import requests
+    import json
+    import time
+
+    CREDENTIALS_PATH = '/tmp/credentials.json'
+    KEYCLOAK_URL = "https://keycloak.iudx.org.in"
+    KEYCLOAK_REALM = "iudx"
+    KEYCLOAK_CLIENT_ID = "angular-iudx-client"
+
+    def get_keycloak_token(refresh_token):
+        url = f"{KEYCLOAK_URL}/auth/realms/{KEYCLOAK_REALM}/protocol/openid-connect/token"
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        payload=f'client_id={KEYCLOAK_CLIENT_ID}&grant_type=refresh_token&refresh_token={refresh_token}'
+        response = requests.request("POST", url, headers=headers, data=payload)
+        return response.json()
+
+    def run():
+        if not os.path.exists(CREDENTIALS_PATH):
+            with open(CREDENTIALS_PATH, 'w', encoding='utf-8') as f:
+                json.dump(get_keycloak_token(os.environ["KC_REFRESH_TOKEN"]), f, ensure_ascii=False, indent=4)
+
+        while True:
+            with open(CREDENTIALS_PATH) as f:
+                json_data = json.load(f)
+                token = json_data["refresh_token"]
+            with open(CREDENTIALS_PATH, 'w', encoding='utf-8') as f:
+                json.dump(get_keycloak_token(token), f, ensure_ascii=False, indent=4)
+            time.sleep(120)
+
+    if __name__ == "__main__":
+        run()

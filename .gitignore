@@ -7,3 +7,12 @@ coverage.out
 ./temp
 
 ./sandboxes/
+
+.vscode
+
+auth
+certs
+authenticator
+jupyterhub_api
+
+keycloak-cert
