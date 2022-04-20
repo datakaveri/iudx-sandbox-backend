@@ -1,0 +1,253 @@
+replicas: 1
+resources:
+  requests:
+    cpu: "0.25"
+    memory: 1Gi
+  limits:
+    cpu: "2"
+    memory: 1Gi
+
+registry:
+  url: "https://sandbox-registry.iudx.org.in"
+
+config:
+  BinderHub:
+    use_registry: true
+    image_prefix: "sandbox-registry.iudx.org.in/dk-"
+    hub_url: https://hub.playground.iudx.org.in
+    auth_enabled: true
+    cors_allow_origin: "*"
+    # build_image: "local/build-image" # we can use this to have the custom default image for binder builds
+    per_repo_quota: 100
+    per_repo_quota_higher: 200
+    build_memory_limit: "4G"
+    build_memory_request: "1G" 
+    template_path: /etc/binderhub/custom/templates
+    extra_static_path: /etc/binderhub/custom/static
+    extra_static_url_prefix: /extra_static/
+    template_variables:
+      EXTRA_STATIC_URL_PREFIX: "/extra_static/"
+    appendix: RUN pip install tqdm fastparquet pandas numpy statsmodels scikit-learn scipy folium geojsoncontour seaborn ipywidgets plotly h3 datetime keplergl supervisor voila ipyvuetify voila-vuetify bqplot matplotlib git+https://github.com/datakaveri/iudx-python-sdk
+  GithubRepoProvider:
+    # Add banned repositories to the list below
+    # They should be strings that will match "^<org-name>/<repo-name>.*"
+    banned_specs:
+      - ^((?!datakaveri).)*$
+  DockerRegistry:
+    token_url: ""
+
+initContainers:
+  - name: git-clone-templates
+    image: alpine/git
+    args:
+      - clone
+      - --single-branch
+      - --branch=main
+      - --depth=1
+      - --
+      - https://github.com/swarup-e/binder-custom-ui
+      - /etc/binderhub/custom
+    securityContext:
+      runAsUser: 0
+    volumeMounts:
+      - name: custom-templates
+        mountPath: /etc/binderhub/custom
+
+extraVolumes:
+  - name: custom-templates
+    emptyDir: {}
+extraVolumeMounts:
+  - name: custom-templates
+    mountPath: /etc/binderhub/custom
+
+service:
+  type: ClusterIP
+
+jupyterhub:
+  proxy:
+    service:
+      type: ClusterIP
+  ingress:
+    enabled: true
+    hosts:
+      - hub.playground.iudx.io
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: "true"
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/proxy-body-size: '0'
+    tls:
+       - secretName: hub-playground-iudx-org-in-tls
+         hosts:
+          - hub.playground.iudx.org.in
+
+  custom:
+    binderauth_enabled: true
+    mount_all_projects: true
+    default_project:
+      repo_url: "https://github.com/swarup-e/iudx-playground-example"
+      ref: "main"
+
+  cull:
+    users: False
+  hub:
+    extraVolumes:
+      - name: persistent-bhub-config
+        configMap:
+          name: persistent-bhub-config
+    extraVolumeMounts:
+      - name: persistent-bhub-config
+        mountPath: /usr/local/etc/jupyterhub/persistent_bhub_config.py
+        subPath: persistent_bhub_config.py
+
+    redirectToServer: false
+    allowNamedServers: true
+    namedServerLimitPerUser: 10
+    config:
+      BinderSpawner:
+        auth_enabled: true
+        cors_allow_origin: "*"
+      GenericOAuthenticator:
+        auto_login: true
+        enable_auth_state: true
+        authorize_url: https://keycloak.iudx.org.in/auth/realms/iudx/protocol/openid-connect/auth
+        client_id: angular-iudx-client
+        login_service: keycloak
+        oauth_callback_url: https://hub.playground.iudx.org.in/hub/oauth_callback
+        token_url: https://keycloak.iudx.org.in/auth/realms/iudx/protocol/openid-connect/token
+        userdata_params:
+          state: state
+        userdata_url: https://keycloak.iudx.org.in/auth/realms/iudx/protocol/openid-connect/userinfo
+        username_key: preferred_username
+        scope:
+          - openid
+          - offline_access
+        
+      JupyterHub:
+        authenticator_class: oauthenticator.generic.GenericOAuthenticator
+    extraConfig:
+      authpasstoken: |
+        from oauthenticator.generic import GenericOAuthenticator
+        from tornado import gen
+        import time
+
+        class CustomKeycloakAuthenticator(GenericOAuthenticator):
+          @gen.coroutine
+          def pre_spawn_start(self, user, spawner):
+            auth_state = yield user.get_auth_state()
+            if not auth_state:
+              return
+            print(auth_state)
+            spawner.environment['KC_ACCESS_TOKEN'] = auth_state['access_token']
+            spawner.environment['KC_REFRESH_TOKEN'] = auth_state['refresh_token']
+        c.JupyterHub.authenticator_class = CustomKeycloakAuthenticator
+        c.Authenticator.enable_auth_state = True
+        c.Authenticator.refresh_pre_spawn = True
+      00-binder: |
+        from persistent_bhub_config import PersistentBinderSpawner
+        c.JupyterHub.spawner_class = PersistentBinderSpawner
+    
+    services:
+      binder:
+        oauth_no_confirm: true
+        oauth_redirect_uri: https://playground.iudx.org.in/oauth_callback
+        oauth_client_id: "playground-client"
+        admin: true
+    
+    db:
+      type: postgres
+
+  singleuser:
+    cmd: jupyterhub-singleuser
+    defaultUrl: "/lab"
+    podNameTemplate: "pod-{userid}-{servername}"
+    extraEnv:
+      JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
+    nodeSelector:
+      node.kubernetes.io/instance-type: t3.xlarge
+    memory:
+      guarantee: 2.6G
+      limit: 4G
+    cpu:
+      guarantee: 1
+      limit: 2
+    storage:
+      type: dynamic
+      dynamic:
+        storageClass: efs-storage-class
+        pvcNameTemplate: "jpvc-{userid}-{servername}"
+        volumeNameTemplate: "jvlm-{userid}-{servername}"
+      capacity: 2Gi
+      extraVolumes:
+        - name: scheduler-script
+          configMap:
+            name: scheduler-script
+        - name: supervisord-config
+          configMap:
+            name: supervisord-config
+        - name: jupyter-config
+          configMap:
+            name: jupyter-config
+      extraVolumeMounts:
+        - name: scheduler-script
+          mountPath: /tmp/scheduler_script.py
+          subPath: scheduler_script.py
+        - name: supervisord-config
+          mountPath: /tmp/supervisord.conf
+          subPath: supervisord.conf
+        - name: jupyter-config
+          mountPath: /tmp/jupyter_config.json
+          subPath: jupyter_config.json
+    lifecycleHooks:
+      postStart:
+        exec:
+          command:
+            - "sh"
+            - "-c"
+            - >
+              mkdir /tmp/logs;
+              supervisord -c /tmp/supervisord.conf;
+              jupyter constrib nbextension install --user;
+              jupyter nbextension enable --py widgetsnbextension;
+              jupyter server extension enable voila;
+              jupyter trust $HOME/*.ipynb
+
+  prePuller:
+    hook:
+      enabled: false
+    continuous:
+      enabled: false
+
+  imagePullSecret:
+    create: true
+    automaticReferenceInjection: true
+    registry: sandbox-registry.iudx.org.in
+
+ingress:
+  enabled: true
+  hosts:
+     - playground.iudx.org.in
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: '0'
+  https:
+    enabled: true
+    type: nginx
+  tls:
+    - secretName: playground-iudx-org-in-tls
+      hosts:
+        - playground.iudx.org.in
+
+extraConfig:
+  10-repo-providers: |
+    from binderhub.repoproviders import GitHubRepoProvider
+    c.BinderHub.repo_providers = {
+        'gh': GitHubRepoProvider,
+    }
+  custom_options: |
+    import os
+    import json
+    os.environ['JUPYTERHUB_COOKIE_OPTIONS'] = json.dumps({'httponly': False})
+    print("loaded")

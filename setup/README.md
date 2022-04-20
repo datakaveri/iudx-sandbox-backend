@@ -148,15 +148,6 @@ Any Oauth supported authorization server can be used to authenticate jupyter ser
 In this repo keycloak is used as example
 
 
-### Container Registry
-
-Binderhub build docker images using git repo, and it pushes to docker registry so that jupyterhub can launch user servers based on these images. 
-
-In this example container registry is disabled but it is recommended to use in production environment.
-
-Follow [this document](https://binderhub.readthedocs.io/en/latest/zero-to-binderhub/setup-registry.html) for configuring registry to binderhub
-
-
 ## Get Started
 
 Refer the `secret.yaml` file in this repo. Replace apiToken and secretToken with new one. 
@@ -172,6 +163,44 @@ Create `binder` namespace using kubectl
 
 ```shell
 kubectl create ns binder
+```
+
+### Deploy Database
+
+Create database for binderhub which will be shared by sandbox backend as well
+
+Update db name, username and password
+
+```shell
+kubectl -n binder apply -f postgres-config.yaml
+kubectl -n binder apply -f database.yaml
+```
+
+### Container Registry
+
+Binderhub build docker images using git repo, and it pushes to docker registry so that jupyterhub can launch user servers based on these images. 
+
+```shell
+helm repo add twuni https://helm.twun.io
+helm repo update
+```
+
+Create password hash using below command
+
+```shell
+docker run --rm --entrypoint htpasswd registry:2.7.0 -Bbn iudx iudx123 > ./htpasswd
+```
+
+Copy **htpasswd** content to registry.yaml file unser secrets: htpasswd
+
+Update s3 credential configurations like bucket, region, regionEndpoint, s3 access key and secret
+
+Configure storage class name for persistent storage
+
+Run below command once all the configuration is done
+
+```shell
+helm install registry twuni/docker-registry --namespace=binder -f secret.yaml -f registry.yaml
 ```
 
 ### Create all configmaps
@@ -286,6 +315,10 @@ Note that this function runs only once i.e., during spawning container.
 Database configuration is optional if not required then you can remove from the config file.
 In production the database is shared with the sandbox backend hence it has to be configured.
 By default jupyterhub has SQLite database in the shared storage space.
+
+Since we have created database above update those values in **secret.yaml** file 
+
+### Deploy Binderhub Setup
 
 Commands to start the server
 
