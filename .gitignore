@@ -16,3 +16,5 @@ authenticator
 jupyterhub_api
 
 keycloak-cert
+
+htpasswd
