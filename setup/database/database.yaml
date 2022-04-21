@@ -25,6 +25,9 @@ spec:
       labels:
         app: postgres
     spec:
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
       containers:
         - name: postgres
           image: postgres:10.1
