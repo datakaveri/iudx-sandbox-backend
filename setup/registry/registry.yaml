@@ -20,14 +20,13 @@ s3:
 ingress:
   enabled: true
   hosts:
-    - sandbox-registry.iudx.io
+    - sandbox-registry.iudx.org.in
   annotations:
     kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
   tls:
-    - secretName: sandbox-registry-iudx-io-tls
+    - secretName: sandbox-registry-iudx-org-in-tls
       hosts:
-        - sandbox-registry.iudx.io
-
+        - sandbox-registry.iudx.org.in
 
