@@ -70,7 +70,7 @@ jupyterhub:
   ingress:
     enabled: true
     hosts:
-      - hub.playground.iudx.io
+      - hub.playground.iudx.org.in
     annotations:
       kubernetes.io/ingress.class: nginx
       kubernetes.io/tls-acme: "true"
