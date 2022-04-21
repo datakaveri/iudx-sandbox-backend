@@ -1,3 +1,20 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: postgres-pv
+  labels:
+    type: postgres-pv
+spec:
+  storageClassName: ebs-storage-class
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  awsElasticBlockStore:
+        volumeID: "vol-08e827611a1d279f0"
+        fsType: ext4
+    
+---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -5,11 +22,15 @@ metadata:
   labels:
     types: postgres-pvc
 spec:
+  storageClassName: ebs-storage-class
   accessModes:
     - ReadWriteMany
   resources:
     requests:
       storage: 5Gi
+  selector:
+    matchLabels:
+      type: postgres-pv
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -25,9 +46,6 @@ spec:
       labels:
         app: postgres
     spec:
-      securityContext:
-        runAsUser: 1001
-        runAsGroup: 1001
       containers:
         - name: postgres
           image: postgres:10.1
