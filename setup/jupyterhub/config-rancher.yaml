@@ -4,7 +4,7 @@ resources:
     cpu: "0.25"
     memory: 1Gi
   limits:
-    cpu: "2"
+    cpu: "1"
     memory: 1Gi
 
 registry:
@@ -167,10 +167,7 @@ jupyterhub:
       node.kubernetes.io/instance-type: t3.xlarge
     memory:
       guarantee: 2.6G
-      limit: 4G
-    cpu:
-      guarantee: 1
-      limit: 2
+      limit: 3G
     storage:
       type: dynamic
       dynamic:
