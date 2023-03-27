@@ -6,12 +6,12 @@ resources:
     memory: 1Gi
 
 registry:
-  url: "https://sandbox-registry.iudx.org.in"
+  url: "https://private-registry.iudx.org.in"
 
 config:
   BinderHub:
     use_registry: true
-    image_prefix: "sandbox-registry.iudx.org.in/dk-"
+    image_prefix: "private-registry.iudx.org.in/dk-"
     hub_url: https://hub.playground.iudx.org.in
     auth_enabled: true
     cors_allow_origin: "*"
@@ -97,6 +97,12 @@ jupyterhub:
       - name: persistent-bhub-config
         mountPath: /usr/local/etc/jupyterhub/persistent_bhub_config.py
         subPath: persistent_bhub_config.py
+    
+#    tolerations:
+#      - key: "target.application"
+#        operator: "Equal"
+#        value: "sandbox"
+#        effect: "NoSchedule"    
 
     redirectToServer: false
     allowNamedServers: true
@@ -159,10 +165,15 @@ jupyterhub:
     cmd: jupyterhub-singleuser
     defaultUrl: "/lab"
     podNameTemplate: "pod-{userid}-{servername}"
+    extraTolerations:
+      - key: "target.application"
+        operator: "Equal"
+        value: "sandbox"
+        effect: "NoSchedule"
     extraEnv:
       JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
     nodeSelector:
-      node.kubernetes.io/instance-type: t3.xlarge
+      node.kubernetes.io/instance-type: t3a.xlarge
     memory:
       guarantee: 2.6G
       limit: 3G
@@ -216,7 +227,7 @@ jupyterhub:
   imagePullSecret:
     create: true
     automaticReferenceInjection: true
-    registry: sandbox-registry.iudx.org.in
+    registry: private-registry.iudx.org.in
 
 ingress:
   enabled: true
@@ -246,3 +257,16 @@ extraConfig:
     import json
     os.environ['JUPYTERHUB_COOKIE_OPTIONS'] = json.dumps({'httponly': False})
     print("loaded")
+
+imageCleaner:
+  enabled: false
+
+dind:
+  enabled: true
+  daemonset:
+    image:
+      name: docker
+      tag: 23.0.1-dind
+    extraArgs:
+      - --mtu
+      - "1400"
