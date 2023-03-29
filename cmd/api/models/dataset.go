@@ -1,34 +1,51 @@
 package models
 
 import (
-	"fmt"
+	"time"
 
 	"github.com/iudx-sandbox-backend/pkg/application"
 	"github.com/iudx-sandbox-backend/pkg/logger"
 )
 
-
-
 type Dataset struct {
-	// accessPolicy	string
-	// createdAt		time.Time
-	description		string `json:"description"`
-	// icon			string
-	// id				string
-	// instance		string
-	// itemCreatedAt	string
-	// itemStatus		string
-	label			string `json:"label"`
-	name			string `json:"name"`
-	// repositoryURL	string
-	// resourceServer	string
-	// resourceType	string
-	// resources		int
-	// schema			string
-	// tags			[]string	
+	AccessPolicy   string    `json:"accessPolicy"`
+	CreatedAt      time.Time `json:"createdAt"`
+	Description    string    `json:"description"`
+	Icon           string    `json:"icon"`
+	Id             string    `json:"id"`
+	InstanceName   string    `json:"instanceName"`
+	ItemCreatedAt  time.Time `json:"itemCreatedAt"`
+	ItemStatus     string    `json:"itemStatus"`
+	LabelTag       string    `json:"labelTag"`
+	DatasetName    string    `json:"datasetName"`
+	RepositoryURL  string    `json:"repositoryURL"`
+	ResourceServer string    `json:"resourceServer"`
+	ResourceType   string    `json:"resourceType"`
+	Resources      int
+	SchemaName     string `json:"schemaName"`
+	// Tags           []uint8 `json:"tags"`
 }
 
-func (g *Dataset) Get(app *application.Application) ([]Dataset, error) {
+type DatasetResponse struct {
+	AccessPolicy   string
+	CreatedAt      time.Time
+	Description    string
+	Icon           string
+	Id             string
+	InstanceName   string
+	ItemCreatedAt  string
+	ItemStatus     string
+	LabelTag       string
+	DatasetName    string
+	RepositoryURL  string
+	ResourceServer string
+	ResourceType   string
+	Resources      int
+	SchemaName     string
+	// Tags           []uint8
+}
+
+func (g *Dataset) Get(app *application.Application) ([]DatasetResponse, error) {
 	stmt := `
 		SELECT * from dataset;
 	`
@@ -40,25 +57,21 @@ func (g *Dataset) Get(app *application.Application) ([]Dataset, error) {
 
 	defer rows.Close()
 
-	datasets := []Dataset{}
+	datasets := []DatasetResponse{}
 
 	for rows.Next() {
-		var dataset Dataset
-		// err := 	rows.Scan(
-		// &dataset.accessPolicy, &dataset.createdAt, &dataset.description,
-		// &dataset.icon, &dataset.id, &dataset.instance,
-		// &dataset.itemCreatedAt, &dataset.itemStatus, &dataset.label,
-		// &dataset.label, &dataset.name, &dataset.repositoryURL,
-		// &dataset.resourceServer, &dataset.resourceType, &dataset,dataset.resources,
-		// &dataset.schema)
-
-		err := 	rows.Scan(&dataset.description, &dataset.label, &dataset.name)
+		var dataset DatasetResponse
+		err := rows.Scan(
+			&dataset.AccessPolicy, &dataset.CreatedAt, &dataset.Description,
+			&dataset.Icon, &dataset.Id, &dataset.InstanceName,
+			&dataset.ItemCreatedAt, &dataset.ItemStatus, &dataset.LabelTag,
+			&dataset.DatasetName, &dataset.RepositoryURL,
+			&dataset.ResourceServer, &dataset.ResourceType, &dataset.Resources,
+			&dataset.SchemaName)
 
 		if err != nil {
 			return nil, err
 		}
-
-		fmt.Println(dataset)
 
 		datasets = append(datasets, dataset)
 	}
@@ -72,17 +85,35 @@ func (g *Dataset) Get(app *application.Application) ([]Dataset, error) {
 	return datasets, nil
 }
 
-func (g* Dataset) Onboard(app *application.Application) error {
+func (g *Dataset) Onboard(app *application.Application) error {
 	stmt := `
 		INSERT INTO dataset (
+			"accessPolicy",
+			"createdAt",
 			"description",
-			"label",
-			"name"
+			"icon",           
+			"id", 
+			"instanceName",
+			"itemCreatedAt",
+			"itemStatus",
+			"labelTag",
+			"datasetName",
+			"repositoryURL",
+			"resourceServer",
+			"resourceType",
+			"resources",
+			"schemaName"
 		) values (
-			$!, $2, $3
-		)
+			$1, $2, $3, $4, $5,
+			$6, $7, $8, $9, $10,
+			$11, $12, $13, $14, $15
+		);
 	`
-	result, err := app.DB.Client.Exec(stmt, g.description, g.label, g.name)
+
+	result, err := app.DB.Client.Exec(stmt, g.AccessPolicy, g.CreatedAt,
+		g.Description, g.Icon, g.Id, g.InstanceName, g.ItemCreatedAt, g.ItemStatus,
+		g.LabelTag, g.DatasetName, g.RepositoryURL, g.ResourceServer, g.ResourceType,
+		g.Resources, g.SchemaName)
 
 	if err != nil {
 		return err

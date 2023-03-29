@@ -13,7 +13,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func listDatset(app *application.Application) httprouter.Handle {
+func listDataset(app *application.Application) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		defer r.Body.Close()
 
@@ -28,12 +28,10 @@ func listDatset(app *application.Application) httprouter.Handle {
 				return
 			}
 
-
 			w.WriteHeader(http.StatusInternalServerError)
 			logger.Error.Printf("Error in fetching Notebooks %v\n", err)
 			return
 		}
-
 
 		w.Header().Set("Content-Type", "application/json")
 		newResponse := apiresponse.New("success", "List of all datasets")
@@ -45,5 +43,5 @@ func listDatset(app *application.Application) httprouter.Handle {
 }
 
 func Do(app *application.Application) httprouter.Handle {
-	return middleware.Chain(listDatset(app), middleware.LogRequest)
+	return middleware.Chain(listDataset(app), middleware.LogRequest)
 }

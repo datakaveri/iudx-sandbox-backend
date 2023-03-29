@@ -1,4 +1,4 @@
-package onbaorddataset
+package onboarddataset
 
 import (
 	"encoding/json"
@@ -16,7 +16,6 @@ func onboardDataset(app *application.Application) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		defer r.Body.Close()
 
-
 		dataset := &models.Dataset{}
 		json.NewDecoder(r.Body).Decode(dataset)
 
@@ -25,7 +24,7 @@ func onboardDataset(app *application.Application) httprouter.Handle {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		
+
 		w.Header().Set("Content-Type", "application-json")
 		newResponse := apiresponse.New("success", "Dataset inserted successfully")
 		dataResponse := newResponse.AddData(map[string]string{
@@ -37,5 +36,5 @@ func onboardDataset(app *application.Application) httprouter.Handle {
 }
 
 func Do(app *application.Application) httprouter.Handle {
-	return middleware.Chain(onboardDataset(app), middleware.LogRequest,)
+	return middleware.Chain(onboardDataset(app), middleware.LogRequest)
 }
