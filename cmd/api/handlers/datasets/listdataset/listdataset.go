@@ -29,7 +29,13 @@ func listDataset(app *application.Application) httprouter.Handle {
 			}
 
 			w.WriteHeader(http.StatusInternalServerError)
-			logger.Error.Printf("Error in fetching Notebooks %v\n", err)
+			newResponse := apiresponse.New("failed", "Error in fetching datasets")
+			dataResponse := newResponse.AddData(map[string]string{
+				"Error": err.Error(),
+			})
+			response, _ := dataResponse.Marshal()
+			w.Write(response)
+			logger.Error.Printf("Error in fetching Datasets %v\n", err)
 			return
 		}
 

@@ -22,6 +22,12 @@ func onboardDataset(app *application.Application) httprouter.Handle {
 		if err := dataset.Onboard(app); err != nil {
 			logger.Error.Printf("Error in creating dataset %v\n", err)
 			w.WriteHeader(http.StatusInternalServerError)
+			newResponse := apiresponse.New("failed", "Dataset was not inserted")
+			dataResponse := newResponse.AddData(map[string]string{
+				"Error": err.Error(),
+			})
+			response, _ := dataResponse.Marshal()
+			w.Write(response)
 			return
 		}
 

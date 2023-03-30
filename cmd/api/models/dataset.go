@@ -5,6 +5,7 @@ import (
 
 	"github.com/iudx-sandbox-backend/pkg/application"
 	"github.com/iudx-sandbox-backend/pkg/logger"
+	"github.com/lib/pq"
 )
 
 type Dataset struct {
@@ -22,8 +23,8 @@ type Dataset struct {
 	ResourceServer string    `json:"resourceServer"`
 	ResourceType   string    `json:"resourceType"`
 	Resources      int
-	SchemaName     string `json:"schemaName"`
-	// Tags           []uint8 `json:"tags"`
+	SchemaName     string   `json:"schemaName"`
+	Tags           []string `json:"tags"`
 }
 
 type DatasetResponse struct {
@@ -42,7 +43,7 @@ type DatasetResponse struct {
 	ResourceType   string
 	Resources      int
 	SchemaName     string
-	// Tags           []uint8
+	Tags           []string
 }
 
 func (g *Dataset) Get(app *application.Application) ([]DatasetResponse, error) {
@@ -67,7 +68,7 @@ func (g *Dataset) Get(app *application.Application) ([]DatasetResponse, error) {
 			&dataset.ItemCreatedAt, &dataset.ItemStatus, &dataset.LabelTag,
 			&dataset.DatasetName, &dataset.RepositoryURL,
 			&dataset.ResourceServer, &dataset.ResourceType, &dataset.Resources,
-			&dataset.SchemaName)
+			&dataset.SchemaName, pq.Array(&dataset.Tags))
 
 		if err != nil {
 			return nil, err
@@ -102,18 +103,20 @@ func (g *Dataset) Onboard(app *application.Application) error {
 			"resourceServer",
 			"resourceType",
 			"resources",
-			"schemaName"
+			"schemaName",
+			"tags"
 		) values (
 			$1, $2, $3, $4, $5,
 			$6, $7, $8, $9, $10,
-			$11, $12, $13, $14, $15
+			$11, $12, $13, $14, $15,
+			$16
 		);
 	`
 
 	result, err := app.DB.Client.Exec(stmt, g.AccessPolicy, g.CreatedAt,
 		g.Description, g.Icon, g.Id, g.InstanceName, g.ItemCreatedAt, g.ItemStatus,
 		g.LabelTag, g.DatasetName, g.RepositoryURL, g.ResourceServer, g.ResourceType,
-		g.Resources, g.SchemaName)
+		g.Resources, g.SchemaName, pq.Array(g.Tags))
 
 	if err != nil {
 		return err
