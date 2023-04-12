@@ -1,4 +1,4 @@
-package listdataset
+package getdataset
 
 import (
 	"database/sql"
@@ -13,13 +13,16 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func listDataset(app *application.Application) httprouter.Handle {
+func getDataset(app *application.Application) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+
+		unique_id := p.ByName("id")
+
 		defer r.Body.Close()
 
 		dataset := &models.Dataset{}
 
-		datasets, err := dataset.ListDataset(app)
+		datasets, err := dataset.GetDataset(app, unique_id)
 
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
@@ -41,13 +44,13 @@ func listDataset(app *application.Application) httprouter.Handle {
 
 		w.Header().Set("Content-Type", "application/json")
 		newResponse := apiresponse.New("success", "List of all datasets")
-
 		dataResponse := newResponse.AddData(datasets)
 		response, _ := dataResponse.Marshal()
 		w.Write(response)
 	}
+
 }
 
 func Do(app *application.Application) httprouter.Handle {
-	return middleware.Chain(listDataset(app), middleware.LogRequest)
+	return middleware.Chain(getDataset(app), middleware.LogRequest)
 }

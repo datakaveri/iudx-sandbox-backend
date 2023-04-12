@@ -1,0 +1,18 @@
+{
+	"id": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclefeb21tofeb28",
+	"createdAt": "2022-10-06T05:27:10.166Z",
+	"dataset": "633e672e9072f13ab845be30",
+	"description": "Archive for the period Feb21-Feb28 2022",
+	"downloadURL": "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_feb_21_28.parquet",
+	"icon": "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png",
+	"instance": "sandbox",
+	"itemCreatedAt": "2022-03-28T01:19:07.000Z",
+	"itemStatus": "ACTIVE",
+	"label": "Vehicle Positions for February 21 - February 28 2022",
+	"name": "swmvehiclefeb21tofeb28",
+	"provider": "62387a479072f13ab80be4b9",
+	"resourceGroup": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm",
+	"tags": [],
+	"type": ["iudx:Resource", "iudx:WasteManagement"],
+	"updatedAt": "2023-04-12T04:00:00.840Z"
+}

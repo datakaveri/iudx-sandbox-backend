@@ -19,8 +19,8 @@ func onboardDataset(app *application.Application) httprouter.Handle {
 		dataset := &models.Dataset{}
 		json.NewDecoder(r.Body).Decode(dataset)
 
-		if err := dataset.Onboard(app); err != nil {
-			logger.Error.Printf("Error in creating dataset %v\n", err)
+		if err := dataset.OnboardDataset(app); err != nil {
+			logger.Error.Printf("Error in onboarding dataset %v\n", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			newResponse := apiresponse.New("failed", "Dataset was not inserted")
 			dataResponse := newResponse.AddData(map[string]string{
@@ -32,7 +32,7 @@ func onboardDataset(app *application.Application) httprouter.Handle {
 		}
 
 		w.Header().Set("Content-Type", "application-json")
-		newResponse := apiresponse.New("success", "Dataset inserted successfully")
+		newResponse := apiresponse.New("success", "Dataset onboarded successfully")
 		dataResponse := newResponse.AddData(map[string]string{
 			"Success": "True",
 		})

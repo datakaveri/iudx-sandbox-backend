@@ -1,4 +1,4 @@
-package listdataset
+package listresource
 
 import (
 	"database/sql"
@@ -13,13 +13,16 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func listDataset(app *application.Application) httprouter.Handle {
+func listResource(app *application.Application) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+
+		unique_id := p.ByName("id")
+
 		defer r.Body.Close()
 
-		dataset := &models.Dataset{}
+		resource := &models.Resource{}
 
-		datasets, err := dataset.ListDataset(app)
+		resources, err := resource.ListResource(app, unique_id)
 
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
@@ -29,7 +32,7 @@ func listDataset(app *application.Application) httprouter.Handle {
 			}
 
 			w.WriteHeader(http.StatusInternalServerError)
-			newResponse := apiresponse.New("failed", "Error in fetching datasets")
+			newResponse := apiresponse.New("failed", "Error in fetching resources")
 			dataResponse := newResponse.AddData(map[string]string{
 				"Error": err.Error(),
 			})
@@ -40,14 +43,14 @@ func listDataset(app *application.Application) httprouter.Handle {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		newResponse := apiresponse.New("success", "List of all datasets")
+		newResponse := apiresponse.New("success", "List of all resources")
 
-		dataResponse := newResponse.AddData(datasets)
+		dataResponse := newResponse.AddData(resources)
 		response, _ := dataResponse.Marshal()
 		w.Write(response)
 	}
 }
 
 func Do(app *application.Application) httprouter.Handle {
-	return middleware.Chain(listDataset(app), middleware.LogRequest)
+	return middleware.Chain(listResource(app), middleware.LogRequest)
 }
