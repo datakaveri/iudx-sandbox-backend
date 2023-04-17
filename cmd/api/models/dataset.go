@@ -1,7 +1,9 @@
 package models
 
 import (
+	"database/sql/driver"
 	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/iudx-sandbox-backend/pkg/application"
@@ -9,81 +11,82 @@ import (
 	"github.com/lib/pq"
 )
 
-// type ReferenceResource struct {
-// 	Id                string `json:"id"`
-// 	Name              string `json:"name"`
-// 	Description       string `json:"description"`
-// 	AdditionalInfoURL string `json:"additionalInfoURL"`
-// }
-
-// type ReferenceResources map[string]interface{}
+type ResourceItem struct {
+	Id                string `json:"id"`
+	Name              string `json:"name"`
+	Description       string `json:"description"`
+	AdditionalInfoURL string `json:"additionalInfoURL"`
+}
+type ReferenceResource struct {
+	Items []ResourceItem `json:"items"`
+}
 
 type Dataset struct {
-	Id               string          `json:"id"`
-	AccessPolicy     string          `json:"accessPolicy"`
-	CreatedAt        time.Time       `json:"createdAt"`
-	Description      string          `json:"description"`
-	Icon             string          `json:"icon"`
-	Instance         string          `json:"instance"`
-	ItemCreatedAt    time.Time       `json:"itemCreatedAt"`
-	ItemStatus       string          `json:"itemStatus"`
-	IUDXResourceAPIs []string        `json:"iudxResourceAPIs"`
-	Label            string          `json:"label"`
-	Location         json.RawMessage `json:"location"`
-	Name             string          `json:"name"`
-	Provider         json.RawMessage `json:"provider"`
-	// ReferenceResources ReferenceResource `json:"referenceResources"`
-	RepositoryURL  string `json:"repositoryURL"`
-	ResourceServer string `json:"resourceServer"`
-	ResourceType   string `json:"resourceType"`
-	Resources      int
-	Schema         string    `json:"schema"`
-	Tags           []string  `json:"tags"`
-	Type           []string  `json:"type"`
-	Unique_id      string    `json:"unique_id"`
-	UpdatedAt      time.Time `json:"updatedAt"`
-	Views          int
+	Id                 string            `json:"id"`
+	AccessPolicy       string            `json:"accessPolicy"`
+	CreatedAt          time.Time         `json:"createdAt"`
+	Description        string            `json:"description"`
+	Icon               string            `json:"icon"`
+	Instance           string            `json:"instance"`
+	ItemCreatedAt      time.Time         `json:"itemCreatedAt"`
+	ItemStatus         string            `json:"itemStatus"`
+	IUDXResourceAPIs   []string          `json:"iudxResourceAPIs"`
+	Label              string            `json:"label"`
+	Location           json.RawMessage   `json:"location"`
+	Name               string            `json:"name"`
+	Provider           json.RawMessage   `json:"provider"`
+	ReferenceResources ReferenceResource `json:"referenceResources"`
+	RepositoryURL      string            `json:"repositoryURL"`
+	ResourceServer     string            `json:"resourceServer"`
+	ResourceType       string            `json:"resourceType"`
+	Resources          int
+	Schema             string    `json:"schema"`
+	Tags               []string  `json:"tags"`
+	Type               []string  `json:"type"`
+	Unique_id          string    `json:"unique_id"`
+	UpdatedAt          time.Time `json:"updatedAt"`
+	Views              int
 }
 
 type DatasetResponse struct {
-	Id               string
-	AccessPolicy     string
-	CreatedAt        time.Time
-	Description      string
-	Icon             string
-	Instance         string
-	ItemCreatedAt    string
-	ItemStatus       string
-	IUDXResourceAPIs []string
-	Label            string
-	Location         json.RawMessage
-	Name             string
-	Provider         json.RawMessage
-	// ReferenceResources []ReferenceResource
-	RepositoryURL  string
-	ResourceServer string
-	ResourceType   string
-	Resources      int
-	Schema         string
-	Tags           []string
-	Type           []string
-	Unique_id      string
-	UpdatedAt      time.Time
-	Views          int
+	Id                 string
+	AccessPolicy       string
+	CreatedAt          time.Time
+	Description        string
+	Icon               string
+	Instance           string
+	ItemCreatedAt      string
+	ItemStatus         string
+	IUDXResourceAPIs   []string
+	Label              string
+	Location           json.RawMessage
+	Name               string
+	Provider           json.RawMessage
+	ReferenceResources ReferenceResource
+	RepositoryURL      string
+	ResourceServer     string
+	ResourceType       string
+	Resources          int
+	Schema             string
+	Tags               []string
+	Type               []string
+	Unique_id          string
+	UpdatedAt          time.Time
+	Views              int
 }
 
-// func (r ReferenceResources) Value() (driver.Value, error) {
-// 	return json.Marshal(r)
-// }
+func (r ReferenceResource) Value() (driver.Value, error) {
+	return json.Marshal(r)
+}
 
-// func (a *ReferenceResources) Scan(value interface{}) error {
-// 	b, ok := value.([]byte)
-// 	if !ok {
-// 		return errors.New("type assertion to []byte failed")
-// 	}
+func (a *ReferenceResource) Scan(value interface{}) error {
+	b, ok := value.([]byte)
+	if !ok {
+		return errors.New("type assertion to []byte failed")
+	}
 
-// 	return json.Unmarshal(b, &a)
-// }
+	return json.Unmarshal(b, &a)
+}
 
 func (g *Dataset) ListDataset(app *application.Application) ([]DatasetResponse, error) {
 	stmt := `
@@ -107,7 +110,7 @@ func (g *Dataset) ListDataset(app *application.Application) ([]DatasetResponse, 
 			&dataset.ItemCreatedAt, &dataset.ItemStatus,
 			pq.Array(&dataset.IUDXResourceAPIs), &dataset.Label,
 			&dataset.Location, &dataset.Name, &dataset.Provider,
-			// pq.Array(&dataset.ReferenceResources),
+			&dataset.ReferenceResources,
 			&dataset.RepositoryURL, &dataset.ResourceServer,
 			&dataset.ResourceType, &dataset.Resources,
 			&dataset.Schema, pq.Array(&dataset.Tags),
@@ -210,7 +213,7 @@ func (g *Dataset) GetDataset(app *application.Application, unique_id string) (Da
 			&dataset.ItemCreatedAt, &dataset.ItemStatus,
 			pq.Array(&dataset.IUDXResourceAPIs), &dataset.Label,
 			&dataset.Location, &dataset.Name, &dataset.Provider,
-			// pq.Array(&dataset.ReferenceResources),
+			&dataset.ReferenceResources,
 			&dataset.RepositoryURL, &dataset.ResourceServer,
 			&dataset.ResourceType, &dataset.Resources,
 			&dataset.Schema, pq.Array(&dataset.Tags),

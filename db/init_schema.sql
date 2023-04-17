@@ -38,7 +38,7 @@ create table dataset (
 	"location"          json,
 	"name"              VARCHAR(100)                NOT NULL,
 	"provider"          json,
---	"referenceResources" jsonb,
+	"referenceResources" jsonb,
 	"repositoryURL"     VARCHAR(300)                NOT NULL,
 	"resourceServer"    VARCHAR(300)                NOT NULL,
 	"resourceType"      VARCHAR(30),
@@ -70,3 +70,4 @@ create table resource (
 	"updatedAt" 		timestamp,
 	foreign key ("resourceGroup") 		references dataset("id")
 );
+
