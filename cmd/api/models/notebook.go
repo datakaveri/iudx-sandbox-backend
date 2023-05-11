@@ -97,11 +97,11 @@ func (g *Notebook) Get(app *application.Application, notebookId string) (Noteboo
 func (g *Notebook) List(app *application.Application, userId int) ([]NotebookResponse, error) {
 	stmt := `
 		SELECT users."id", spawners."server_id", spawners."id", spawners."name", notebook."notebookId", notebook."name", notebook."repoName", notebook."url", notebook."token", notebook."buildId", notebook."createdAt", spawners."last_activity"
-		FROM spawners
+		FROM notebook
 		LEFT JOIN users
-		ON users."id" = spawners."user_id"
-		LEFT JOIN notebook
-		ON notebook."userId" = users."id" AND notebook."spawnerId" = spawners."id"
+		ON users."id" = notebook."userId"
+		LEFT JOIN spawners
+		ON spawners."user_id" = users."id" AND notebook."spawnerId" = spawners."id"
 		WHERE notebook."userId" = $1;
 	`
 
