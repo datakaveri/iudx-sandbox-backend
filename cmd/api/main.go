@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/iudx-sandbox-backend/cmd/api/router"
+	"github.com/iudx-sandbox-backend/cmd/tasks"
 	"github.com/iudx-sandbox-backend/pkg/application"
 	"github.com/iudx-sandbox-backend/pkg/exithandler"
 	"github.com/iudx-sandbox-backend/pkg/logger"
@@ -32,7 +33,13 @@ func main() {
 		}
 	}()
 
+	tasks.StartTask(app)
+
 	exithandler.Init(func() {
+		if err := app.TaskQueue.Queue.Consumer().Stop(); err != nil {
+			logger.Error.Println(err.Error())
+		}
+
 		if err := srv.Close(); err != nil {
 			logger.Error.Println(err.Error())
 		}
