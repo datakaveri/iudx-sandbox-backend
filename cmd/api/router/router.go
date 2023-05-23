@@ -10,6 +10,8 @@ import (
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/notebook/notebookbuildstatus"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/notebook/restartnotebook"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/notebook/stopnotebook"
+	"github.com/iudx-sandbox-backend/cmd/api/handlers/referenceresources/listreferenceresource"
+	"github.com/iudx-sandbox-backend/cmd/api/handlers/referenceresources/onboardreferenceresource"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/resources/listresource"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/resources/onboardresource"
 	"github.com/iudx-sandbox-backend/pkg/application"
@@ -32,6 +34,9 @@ func Get(app *application.Application) *httprouter.Router {
 
 	mux.GET("/api/resources/:id", listresource.Do(app))
 	mux.POST("/api/resource", onboardresource.Do(app))
+
+	mux.GET("/api/referenceresources/:id", listreferenceresource.Do(app))
+	mux.POST("/api/referenceresource", onboardreferenceresource.Do(app))
 
 	return mux
 }

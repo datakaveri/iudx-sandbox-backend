@@ -49,10 +49,7 @@ type ResourceResponse struct {
 func (g *Resource) ListResource(app *application.Application, unique_id string) ([]ResourceResponse, error) {
 	stmt := `
 		select * from resource
-		where "resourceGroup" = (
-			select "id" from dataset
-			where "unique_id" = $1
-		);
+		where "resourceGroup" = $1;
 	`
 
 	rows, err := app.DB.Client.Query(stmt, unique_id)
