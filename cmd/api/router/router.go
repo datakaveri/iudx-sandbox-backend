@@ -3,6 +3,8 @@ package router
 import (
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/getdataset"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/listdataset"
+	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/listdomains"
+	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/listtags"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/onboarddataset"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/notebook/buildnotebook"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/notebook/deletenotebook"
@@ -37,6 +39,9 @@ func Get(app *application.Application) *httprouter.Router {
 
 	mux.GET("/api/referenceresources/:id", listreferenceresource.Do(app))
 	mux.POST("/api/referenceresource", onboardreferenceresource.Do(app))
+
+	mux.GET("/api/tags", listtags.Do(app))
+	mux.GET("/api/domains", listdomains.Do(app))
 
 	return mux
 }
