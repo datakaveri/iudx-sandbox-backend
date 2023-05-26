@@ -1,4 +1,4 @@
-package listtags
+package listdomains
 
 import (
 	"database/sql"
@@ -13,13 +13,13 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func listTags(app *application.Application) httprouter.Handle {
+func listDomains(app *application.Application) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		defer r.Body.Close()
 
-		tag := &models.Tag{}
+		domain := &models.Tag{}
 
-		tags, err := tag.ListTags(app)
+		domains, err := domain.ListDomains(app)
 
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
@@ -27,25 +27,25 @@ func listTags(app *application.Application) httprouter.Handle {
 				logger.Info.Println("No records found")
 			}
 			w.WriteHeader(http.StatusInternalServerError)
-			newResponse := apiresponse.New("failed", "Error in fetching tags")
+			newResponse := apiresponse.New("failed", "Error in fetching domains")
 			dataResponse := newResponse.AddData(map[string]string{
 				"Error": err.Error(),
 			})
 			response, _ := dataResponse.Marshal()
 			w.Write(response)
-			logger.Error.Printf("Error in fetching tags %v\n", err)
+			logger.Error.Printf("Error in fetching domains %v\n", err)
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		newResponse := apiresponse.New("success", "List of all tags")
+		newResponse := apiresponse.New("success", "List of all domains")
 
-		dataResponse := newResponse.AddData(tags)
+		dataResponse := newResponse.AddData(domains)
 		response, _ := dataResponse.Marshal()
 		w.Write(response)
 	}
 }
 
 func Do(app *application.Application) httprouter.Handle {
-	return middleware.Chain(listTags(app), middleware.LogRequest)
+	return middleware.Chain(listDomains(app), middleware.LogRequest)
 }
