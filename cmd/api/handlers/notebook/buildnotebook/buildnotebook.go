@@ -1,12 +1,14 @@
 package buildnotebook
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/url"
 
 	"github.com/google/uuid"
 	"github.com/iudx-sandbox-backend/cmd/api/models"
+	"github.com/iudx-sandbox-backend/cmd/tasks/handlers/spawnernotebooksync"
 	"github.com/iudx-sandbox-backend/pkg/apiresponse"
 	"github.com/iudx-sandbox-backend/pkg/application"
 	"github.com/iudx-sandbox-backend/pkg/authutility"
@@ -65,7 +67,7 @@ func CustomHeader(cookie string) func(c *sse.Client) {
 	}
 }
 
-func buildNotebook(app *application.Application) httprouter.Handle {
+func buildNotebook(app *application.Application, spawnerSyncTask *spawnernotebooksync.SpawnerNotebookSyncTask) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 		defer r.Body.Close()
@@ -119,7 +121,9 @@ func buildNotebook(app *application.Application) httprouter.Handle {
 			return
 		}
 
-		go makeSseRequest(app, buildUrl, cookie, notebook.BuildId, notebook.UserId)
+		ctx := context.Background()
+		// go makeSseRequest(app, buildUrl, cookie, notebook.BuildId, notebook.UserId)
+		app.TaskQueue.Queue.Add(spawnerSyncTask.Task.WithArgs(ctx, app, buildUrl, cookie, notebook.BuildId, notebook.UserId))
 
 		w.Header().Set("Content-Type", "application/json")
 		newResponse := apiresponse.New("success", "Notebook Building. Please check the status")
@@ -132,5 +136,6 @@ func buildNotebook(app *application.Application) httprouter.Handle {
 }
 
 func Do(app *application.Application) httprouter.Handle {
-	return middleware.Chain(buildNotebook(app), middleware.LogRequest, middleware.AuthorizeRequest)
+	spawnerNotebookSync := spawnernotebooksync.RegisterTask()
+	return middleware.Chain(buildNotebook(app, spawnerNotebookSync), middleware.LogRequest, middleware.AuthorizeRequest)
 }

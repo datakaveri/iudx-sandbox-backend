@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sandboxserver-deployment
+  namespace: binder
+spec:
+  selector:
+    matchLabels:
+      app: sandboxserver
+  template:
+    metadata:
+      labels:
+        app: sandboxserver
+    spec:
+      containers:
+      - name: sandboxserver-container
+        image: datakaveri/sandbox-backend:latest
+        imagePullPolicy: Always
+
+        env:
+          - name: GO_ENV
+            value: prod
+          - name: API_PORT
+            value: 8080
+          - name: POSTGRES_USER
+            value: <user>
+          - name: POSTGRES_PASSWORD
+            value: <password>
+          - name: POSTGRES_HOST
+            value: <host>
+          - name: POSTGRES_PORT
+            value: 5432
+          - name: POSTGRES_DB
+            value: <db>
+          - name: BINDERHUB_API
+            value: https://playground.iudx.org.in
+          - name: JUPYTERHUB_API
+            value: https://hub.playground.iudx.org.in/hub/api
+          - name: JUPYTERHUB_API_TOKEN
+            value: <token>
+          - name: KEYCLOAK_PUBLIC_KEY
+            value: <key>
+
+        ports:
+        - containerPort: 8080
+        command: ["/bin/sh"]
+        args: ["./scripts/entrypoint.dev.sh"]
+
+      nodeSelector:
+        target.application: sandbox

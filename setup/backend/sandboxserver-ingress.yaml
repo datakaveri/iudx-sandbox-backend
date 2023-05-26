@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sandboxserver-ingress
+  namespace: binder
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization,Accept,Origin,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,token,BuildToken"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET,POST,OPTIONS,PUT,DELETE,PATCH"
+spec:
+  tls:
+  - hosts:
+    - api.sandbox.iudx.io
+    secretName: api-sandbox-iudx-io-tls
+  rules:
+    - host: api.sandbox.iudx.io
+      http:
+        paths:
+        - path: /
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: sandboxserver
+              port:
+                number: 8080
