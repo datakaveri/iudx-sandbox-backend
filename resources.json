@@ -1,0 +1,13 @@
+{
+	"resources": [
+		[
+			{
+				"id": "suratmunicipal.org/6db486cb4f720e8585ba1f45a931c63c25dbbbda/rs.iudx.org.in/surat-itms-additional-info",
+				"name": "Static Transit Management data",
+				"description": "GTFS based static information of buses such as stops, routes, etc.",
+				"additionalInfoURL": "https://catalogue.iudx.org.in/dataset/suratmunicipal.org-6db486cb4f720e8585ba1f45a931c63c25dbbbda-rs.iudx.org.in-surat-itms-additional-info",
+				"datasetID": "datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-surat-itms"
+			}
+		]
+	]
+}

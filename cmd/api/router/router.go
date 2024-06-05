@@ -23,6 +23,8 @@ import (
 func Get(app *application.Application) *httprouter.Router {
 	mux := httprouter.New()
 
+	// mux.GET("/api/docs", )
+
 	mux.GET("/api/notebooks", listnotebook.Do(app))
 	mux.GET("/api/notebooks/build-status", notebookbuildstatus.Do(app))
 	mux.POST("/api/notebooks", buildnotebook.Do(app))

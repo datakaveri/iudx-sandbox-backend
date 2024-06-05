@@ -25,30 +25,21 @@ CREATE TABLE IF NOT EXISTS public.notebook
 );
 
 create table dataset (
-	"id"                VARCHAR(200)    PRIMARY KEY NOT NULL,
+	"id"                VARCHAR(200)    			NOT NULL,
 	"accessPolicy"      VARCHAR(30)                 NOT NULL,
-	"createdAt"         TIMESTAMP                   NOT NULL,
 	"description"       TEXT                        NOT NULL,
+	"domain"			VARCHAR(100),
 	"icon"              VARCHAR(300),
-	"instance"          VARCHAR(30),
-	"itemCreatedAt"     TIMESTAMP,
-	"itemStatus"        VARCHAR(30),
 	"iudxResourceAPIs"  VARCHAR[],
 	"label"             VARCHAR(100)                NOT NULL,
-	"location"          json,
 	"name"              VARCHAR(100)                NOT NULL,
 	"provider"          json,
-	"referenceResources" jsonb,
-	"repositoryURL"     VARCHAR(300)                NOT NULL,
-	"resourceServer"    VARCHAR(300)                NOT NULL,
-	"resourceType"      VARCHAR(30),
-	"resources"         INT,
-	"schema"            VARCHAR(300),
+	"repositoryURL"     VARCHAR(300),
 	"tags"              VARCHAR[],
 	"type"              VARCHAR[],
-	"unique_id"         VARCHAR(200) 				not null,
-	"updatedAt"         TIMESTAMP,
-	"views"             INT
+	"unique_id"         VARCHAR(200) PRIMARY KEY 	not null,
+	"resources"			INT							not NULL,
+	"instance"			VARCHAR(100)				not NULL
 );
 
 create table resource (
@@ -68,6 +59,16 @@ create table resource (
 	"tags" 				VARCHAR[],
 	"type" 				VARCHAR[],
 	"updatedAt" 		timestamp,
-	foreign key ("resourceGroup") 		references dataset("id")
+	foreign key ("resourceGroup") 		references dataset("unique_id")
 );
+
+create table referenceResources (
+	"id"				varchar(200) 	primary key not null,
+	"name"				varchar(100),
+	"description"		text,
+	"additionalInfoURL" VARCHAR(300),
+	"datasetID"			varchar(300)				not null,
+	foreign key ("datasetID") references dataset("unique_id")
+);
+
 

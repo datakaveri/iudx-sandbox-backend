@@ -1,0 +1,889 @@
+[
+	{
+		"_id": "633e672e9072f13ab845be30",
+		"id": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm",
+		"@context": "https://voc.iudx.org.in/",
+		"__v": 0,
+		"accessPolicy": "OPEN",
+		"createdAt": "2022-10-06T05:27:10.148Z",
+		"description": "Solid waste management in smart city contexts involves waste collecting containers (bins) and waste collecting vehicles. Bins are fitted with sensors to monitor the realtime volume (or level) of waste contained within it and the details of the last collected time and vehicle which serviced it. Vehicles are fitted with GPS sensors that report the latest location along with the license_plate (identifier) of that particular vehicle.  This sandbox shows analytics such as - \n 1. Distrubtion of bins across the city \n 2. Regions in which the vehicles ply \n 3. Derived schedules and routes of vehicles and temporal trends \n 4. Bins which are not serviced by any vehicles. <br/>  <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/varanasiswm.jpg\" alt=\"SWM depiction\" height=\"200\" width=\"300\"/> <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic1.png\" alt=\"Analytic1\" height=\"200\" width=\"300\"/> <br/> <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic2.png\" alt=\"Analytic2\" height=\"200\" width=\"300\"/>",
+		"domain": "",
+		"icon": "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png",
+		"instance": "sandbox",
+		"itemCreatedAt": "2022-03-28T00:54:54.000Z",
+		"itemStatus": "ACTIVE",
+		"iudxResourceAPIs": ["ATTR", "TEMPORAL"],
+		"label": "Varanasi Solid Waste Management",
+		"location": {
+			"address": "Varanasi",
+			"type": "Place"
+		},
+		"name": "varanasi-swm",
+		"provider": {
+			"_id": "62387a479072f13ab80be4b9",
+			"description": "Sandbox Admin"
+		},
+		"referenceResources": [
+			{
+				"id": "varanasismartcity.gov.in/62d1f729edd3d2a1a090cb1c6c89356296963d55/rs.iudx.org.in/varanasi-swm-vehicle-live",
+				"name": "Varanasi Solid Waste Management Vehicle Positions",
+				"description": "Real Time location of solid waste management vehicles.",
+				"additionalInfoURL": "https://catalogue.iudx.org.in/dataset/varanasismartcity.gov.in-62d1f729edd3d2a1a090cb1c6c89356296963d55-rs.iudx.org.in-varanasi-swm-vehicle-live"
+			},
+			{
+				"id": "varanasismartcity.gov.in/62d1f729edd3d2a1a090cb1c6c89356296963d55/rs.iudx.org.in/varanasi-swm-bin-level",
+				"name": "Varanasi Solid Waste Management Bin Levels",
+				"description": "Real Time waste bin levels of solid waste management containers",
+				"additionalInfoURL": "https://catalogue.iudx.org.in/dataset/varanasismartcity.gov.in-62d1f729edd3d2a1a090cb1c6c89356296963d55-rs.iudx.org.in-varanasi-swm-bin-level"
+			},
+			{
+				"id": "varanasismartcity.gov.in/62d1f729edd3d2a1a090cb1c6c89356296963d55/rs.iudx.org.in/varanasi-swm-additional-info",
+				"name": "Varanasi Solid Waste Management Bin Locations",
+				"description": "Locations of waste collection containers in Varanasi",
+				"additionalInfoURL": "https://varanasi.catalogue.iudx.org.in/dataset/varanasismartcity.gov.in-62d1f729edd3d2a1a090cb1c6c89356296963d55-rs.iudx.org.in-varanasi-swm-additional-info"
+			}
+		],
+		"repositoryURL": "https://github.com/datakaveri/sandbox-swm.git",
+		"resourceServer": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in",
+		"resourceType": "MESSAGESTREAM",
+		"resources": 9,
+		"schema": "https://voc.iudx.org.in/WasteManagement",
+		"tags": [
+			"dustbin",
+			"dustbin level",
+			"solid waste management",
+			"waste vehicle",
+			"waste dump",
+			"tracking",
+			"capacity",
+			"pickup time",
+			"cleaned time"
+		],
+		"type": ["iudx:ResourceGroup", "iudx:WasteManagement"],
+		"unique_id": "datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm",
+		"updatedAt": "2023-05-22T07:00:00.746Z",
+		"views": 158
+	},
+	{
+		"_id": "633e672e9072f13ab845be4b",
+		"id": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/bangalore-ambulance",
+		"@context": "https://voc.iudx.org.in/",
+		"__v": 0,
+		"accessPolicy": "OPEN",
+		"createdAt": "2022-10-06T05:27:10.183Z",
+		"description": " Real-time positions of ambulances (both motorcycle and full-fledged) can be used to derive interesting insights into a city such as \n 1. Accident prone zones \n 2. Ambulance congestion patterns. In this sandbox, we illustrate the usage of this datasource and highlight some interesting insights that can be derived from it. \n\n <br/>  <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-ambulance/main/docs/ambulance.jpg\" alt=\"GVK Ambulance\" height=\"200\" width=\"300\"/> <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-ambulance/main/docs/analytic1.png\" alt=\"Analytic1\" height=\"200\" width=\"300\"/>",
+		"domain": "UrbanMobility",
+		"icon": "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png",
+		"instance": "sandbox",
+		"itemCreatedAt": "2022-03-29T05:19:44.000Z",
+		"itemStatus": "ACTIVE",
+		"iudxResourceAPIs": ["ATTR", "TEMPORAL"],
+		"label": "Bangalore Ambulance Tracking",
+		"location": {
+			"address": "Bangalore",
+			"type": "Place"
+		},
+		"name": "bangalore-ambulance",
+		"provider": {
+			"_id": "62387a479072f13ab80be4b9",
+			"description": "Sandbox Admin"
+		},
+		"referenceResources": [
+			{
+				"id": "datakaveri.org/fb0924bef803e220e0d0bc8ceaf0a1f999442f32/rs.iudx.org.in/bengaluru-emergency-vehicles",
+				"name": "Ambulance Live",
+				"description": "Realt time positions of ambulances in Bangalore",
+				"additionalInfoURL": "https://bengaluru.catalogue.iudx.org.in/dataset/datakaveri.org-fb0924bef803e220e0d0bc8ceaf0a1f999442f32-rs.iudx.org.in-bengaluru-emergency-vehicles"
+			}
+		],
+		"repositoryURL": "https://github.com/datakaveri/sandbox-ambulance.git",
+		"resourceServer": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in",
+		"resourceType": "MESSAGESTREAM",
+		"resources": 6,
+		"schema": "https://voc.iudx.org.in/EmergencyVehicle",
+		"tags": [
+			"ambulance",
+			"motor cycle ambulance",
+			"bike ambulance",
+			"emergency vehicle",
+			"license plate",
+			"sos",
+			"on call",
+			"emergency service",
+			"patient",
+			"hospital",
+			"on duty",
+			"help",
+			"siren",
+			"emergency transit",
+			"make way",
+			"green corridor"
+		],
+		"type": ["iudx:ResourceGroup", "iudx:EmergencyVehicle"],
+		"unique_id": "datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-bangalore-ambulance",
+		"updatedAt": "2023-05-22T07:00:00.769Z",
+		"views": 49
+	},
+	{
+		"_id": "633e672e9072f13ab845be60",
+		"id": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/surat-itms",
+		"@context": "https://voc.iudx.org.in/",
+		"__v": 0,
+		"accessPolicy": "OPEN",
+		"createdAt": "2022-10-06T05:27:10.211Z",
+		"description": "Surat transit management datasource is a rich and comprehensive GTFS based data stream of public transit operations in the city.  In this sandbox we show analysis on stop-to-stop coverage, temporal and spatial schedule-to-live conformance and show some intuitive and interactive plots to give a wholistic understanding on transit management systems. \n\n <br/>  <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-itms/main/docs/illustration.jpg\" alt=\"Smart Buses\" height=\"200\" width=\"300\"/> <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-itms/main/docs/analytic1.png\" alt=\"Analytic1\" height=\"200\" width=\"300\"/> \n\n <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-itms/main/docs/analytic2.png\" alt=\"Analytic2\" height=\"200\" width=\"300\"/>  <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-itms/main/docs/analytic3.png\" alt=\"Analytic3\" height=\"200\" width=\"300\"/>",
+		"domain": "UrbanMobility",
+		"icon": "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png",
+		"instance": "sandbox",
+		"itemCreatedAt": "2022-03-30T06:53:08.000Z",
+		"itemStatus": "ACTIVE",
+		"iudxResourceAPIs": ["ATTR", "TEMPORAL"],
+		"label": "Surat Transit Management System",
+		"location": {
+			"address": "Surat",
+			"type": "Place"
+		},
+		"name": "surat-itms",
+		"provider": {
+			"_id": "62387a479072f13ab80be4b9",
+			"description": "Sandbox Admin"
+		},
+		"referenceResources": [
+			{
+				"id": "suratmunicipal.org/6db486cb4f720e8585ba1f45a931c63c25dbbbda/rs.iudx.org.in/surat-itms-additional-info",
+				"name": "Static Transit Management data",
+				"description": "GTFS based static information of buses such as stops, routes, etc.",
+				"additionalInfoURL": "https://catalogue.iudx.org.in/dataset/suratmunicipal.org-6db486cb4f720e8585ba1f45a931c63c25dbbbda-rs.iudx.org.in-surat-itms-additional-info"
+			},
+			{
+				"id": "suratmunicipal.org/6db486cb4f720e8585ba1f45a931c63c25dbbbda/rs.iudx.org.in/surat-itms-realtime-info",
+				"name": "Realtime Transit Management data",
+				"description": "Real time bus positions and daily trip schedules",
+				"additionalInfoURL": "https://catalogue.iudx.org.in/dataset/suratmunicipal.org-6db486cb4f720e8585ba1f45a931c63c25dbbbda-rs.iudx.org.in-surat-itms-realtime-info"
+			}
+		],
+		"repositoryURL": "https://github.com/datakaveri/sandbox-itms.git",
+		"resourceServer": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in",
+		"resourceType": "MESSAGESTREAM",
+		"resources": 3,
+		"schema": "https://voc.iudx.org.in/TransitManagement",
+		"tags": [
+			"itms",
+			"mobility",
+			"vehicle",
+			"transport",
+			"buses",
+			"gtfs",
+			"commute",
+			"route",
+			"bus tracking"
+		],
+		"type": ["iudx:ResourceGroup", "iudx:TransitManagement"],
+		"unique_id": "datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-surat-itms",
+		"updatedAt": "2023-05-22T07:00:00.788Z",
+		"views": 34
+	},
+	{
+		"_id": "633e672e9072f13ab845be6f",
+		"id": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/bangalore-streetlights",
+		"@context": "https://voc.iudx.org.in/",
+		"__v": 0,
+		"accessPolicy": "OPEN",
+		"createdAt": "2022-10-06T05:27:10.234Z",
+		"description": " Locations of streetlights in Bangalore (Electronic City) is analysed to show areas with deficient streetlighting. This is an important aspect of pedestrian and womens safety. Energy consumption from these streetlights are also available and their statistics is shown.    \n\n <br/>  <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-streetlight/main/docs/streetlight.jpeg\" alt=\"Elcita Streetlight\" height=\"200\" width=\"300\"/> <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-streetlight/main/docs/analytic1.png\" alt=\"Analytic1\" height=\"200\" width=\"300\"/>",
+		"domain": "StreetLight",
+		"icon": "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png",
+		"instance": "sandbox",
+		"itemCreatedAt": "2022-03-30T19:43:52.000Z",
+		"itemStatus": "ACTIVE",
+		"iudxResourceAPIs": ["ATTR", "TEMPORAL"],
+		"label": "Bangalore Streetlighting",
+		"location": {
+			"address": "Bangalore",
+			"type": "Place"
+		},
+		"name": "bangalore-streetlights",
+		"provider": {
+			"_id": "62387a479072f13ab80be4b9",
+			"description": "Sandbox Admin"
+		},
+		"referenceResources": [
+			{
+				"id": "elcita.in/5c6cb972398bd01ad8c299f1e55da815e0c394f0/rs.iudx.org.in/bengaluru-elcita-streetlight-locations",
+				"name": "Streetlight locations",
+				"description": "Locations of streetlights in Electronic City, Bangalore",
+				"additionalInfoURL": "https://catalogue.iudx.org.in/dataset/elcita.in-5c6cb972398bd01ad8c299f1e55da815e0c394f0-rs.iudx.org.in-bengaluru-elcita-streetlight-locations"
+			}
+		],
+		"repositoryURL": "https://github.com/datakaveri/sandbox-streetlight.git",
+		"resourceServer": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in",
+		"resourceType": "MESSAGESTREAM",
+		"resources": 2,
+		"schema": "https://voc.iudx.org.in/Streetlight",
+		"tags": [
+			"streetlight",
+			"lamp post",
+			"location",
+			"street light",
+			"street lamp",
+			"light pole"
+		],
+		"type": ["iudx:ResourceGroup", "iudx:Streetlight"],
+		"unique_id": "datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-bangalore-streetlights",
+		"updatedAt": "2023-05-22T07:00:00.810Z",
+		"views": 24
+	},
+	{
+		"_id": "633e672e9072f13ab845be7c",
+		"id": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/pune-env-aqm",
+		"@context": "https://voc.iudx.org.in/",
+		"__v": 0,
+		"accessPolicy": "OPEN",
+		"createdAt": "2022-10-06T05:27:10.258Z",
+		"dataDescriptor": {
+			"so2": {
+				"description": "Describes instantaneous and/or aggregated values for sulphur dioxide(SO2).",
+				"maxOverTime": {
+					"description": "Maximum value of SO2 for the last 24 hours",
+					"unitCode": "61",
+					"unitText": "part per billion (ppb)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"avgOverTime": {
+					"description": "Average value of SO2 for the last 15 minutes",
+					"unitCode": "61",
+					"unitText": "part per billion (ppb)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": {
+						"unitCode": "MIN",
+						"value": 15,
+						"unitText": "minutes"
+					},
+					"type": ["ValueDescriptor"]
+				},
+				"minOverTime": {
+					"description": "Minimum value of SO2 for the last 24 hours",
+					"unitCode": "61",
+					"unitText": "part per billion (ppb)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"type": ["TimeSeriesAggregation"]
+			},
+			"airTemperature": {
+				"description": "Describes instantaneous and/or aggregated values for air temperature.",
+				"avgOverTime": {
+					"description": "Average value of temperature for the last 15 minutes",
+					"unitCode": "CEL",
+					"unitText": "degree Celsius (C)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": {
+						"unitCode": "MIN",
+						"value": 15,
+						"unitText": "minutes"
+					},
+					"type": ["ValueDescriptor"]
+				},
+				"type": ["TimeSeriesAggregation"]
+			},
+			"pm10": {
+				"description": "Describes instantaneous and/or aggregated values for particulate matter 10(PM10).",
+				"maxOverTime": {
+					"description": "Maximum value of PM10 for the last 24 hours",
+					"unitCode": "GQ",
+					"unitText": "micro gram per cubic metre (ug/m3)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"avgOverTime": {
+					"description": "Average value of PM10 for the last 15 minutes",
+					"unitCode": "GQ",
+					"unitText": "micro gram per cubic metre (ug/m3)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": {
+						"unitCode": "MIN",
+						"value": 15,
+						"unitText": "minutes"
+					},
+					"type": ["ValueDescriptor"]
+				},
+				"minOverTime": {
+					"description": "Maximum value of PM10 for the last 24 hours",
+					"unitCode": "GQ",
+					"unitText": "micro gram per cubic metre (ug/m3)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"type": ["TimeSeriesAggregation"]
+			},
+			"illuminance": {
+				"description": "Describes instantaneous and/or aggregated ambient light intensity.",
+				"avgOverTime": {
+					"description": "Average value of ambient light intensity for the last 15 minutes",
+					"unitCode": "LUX",
+					"unitText": "lux (lx)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": {
+						"unitCode": "MIN",
+						"value": 15,
+						"unitText": "minutes"
+					},
+					"type": ["ValueDescriptor"]
+				},
+				"type": ["TimeSeriesAggregation"]
+			},
+			"co2": {
+				"description": "Describes instantaneous and/or aggregated values for carban dioxide(CO2).",
+				"maxOverTime": {
+					"description": "Maximum value of CO2 for the last 24 hours",
+					"unitCode": "59",
+					"unitText": "part per million (ppm)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"avgOverTime": {
+					"description": "Average value of CO2 for the last 15 minutes",
+					"unitCode": "59",
+					"unitText": "part per million (ppm)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": {
+						"unitCode": "MIN",
+						"value": 15,
+						"unitText": "minutes"
+					},
+					"type": ["ValueDescriptor"]
+				},
+				"minOverTime": {
+					"description": "Minimum value of CO2 for the last 24 hours",
+					"unitCode": "59",
+					"unitText": "part per million (ppm)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"type": ["TimeSeriesAggregation"]
+			},
+			"airQualityIndex": {
+				"description": "Overall AQI",
+				"unitCode": "C62",
+				"dataSchema": "iudx:Number",
+				"unitText": "dimensionless",
+				"type": ["ValueDescriptor"]
+			},
+			"type": ["iudx:DataDescriptor", "iudx:EnvAQM"],
+			"uv": {
+				"description": "Describes instantaneous and/or aggregated values for Ultraviolet (UV) radiation.",
+				"avgOverTime": {
+					"description": "Average value of UV radiation for the last 15 minutes",
+					"unitCode": "C62",
+					"unitText": "UV Index (uvi)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": {
+						"unitCode": "MIN",
+						"value": 15,
+						"unitText": "minutes"
+					},
+					"type": ["ValueDescriptor"]
+				},
+				"type": ["TimeSeriesAggregation"]
+			},
+			"o3": {
+				"description": "Describes instantaneous and/or aggregated values for Ozone(O3).",
+				"maxOverTime": {
+					"description": "Maximum value of O3 for the last 24 hours",
+					"unitCode": "61",
+					"unitText": "part per billion (ppb)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"avgOverTime": {
+					"description": "Average value of O3 for the last 15 minutes",
+					"unitCode": "61",
+					"unitText": "part per billion (ppb)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": {
+						"unitCode": "MIN",
+						"value": 15,
+						"unitText": "minutes"
+					},
+					"type": ["ValueDescriptor"]
+				},
+				"minOverTime": {
+					"description": "Maximum value of O3 for the last 24 hours",
+					"unitCode": "61",
+					"unitText": "part per billion (ppb)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"type": ["TimeSeriesAggregation"]
+			},
+			"@context": "https://voc.iudx.org.in/",
+			"ambientNoise": {
+				"description": "Describes instantaneous and/or aggregated ambient noise levels.",
+				"avgOverTime": {
+					"description": "Average value of ambient noise level for the last 15 minutes",
+					"unitCode": "2N",
+					"unitText": "decibel (dB)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": {
+						"unitCode": "MIN",
+						"value": 15,
+						"unitText": "minutes"
+					},
+					"type": ["ValueDescriptor"]
+				},
+				"type": ["TimeSeriesAggregation"]
+			},
+			"airQualityLevel": {
+				"description": "Air Quality Category Indication. Qualitative level defined according to the local health agencies. For example, 'GOOD', 'MODERATE', 'POOR', 'UNHEALTHY', 'SEVERE', 'HAZARDOUS' etc.",
+				"dataSchema": "iudx:Text",
+				"type": ["ValueDescriptor"]
+			},
+			"no2": {
+				"description": "Describes instantaneous and/or aggregated values for nitrogen dioxide(NO2).",
+				"maxOverTime": {
+					"description": "Maximum value of NO2 for the last 24 hours",
+					"unitCode": "61",
+					"unitText": "part per billion (ppb)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"avgOverTime": {
+					"description": "Average value of NO2 for the last 15 minutes",
+					"unitCode": "61",
+					"unitText": "part per billion (ppb)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": {
+						"unitCode": "MIN",
+						"value": 15,
+						"unitText": "minutes"
+					},
+					"type": ["ValueDescriptor"]
+				},
+				"minOverTime": {
+					"description": "Maximum value of NO2 for the last 24 hours",
+					"unitCode": "61",
+					"unitText": "part per billion (ppb)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"type": ["TimeSeriesAggregation"]
+			},
+			"relativeHumidity": {
+				"description": "Describes instantaneous and/or aggregated values for relativeHumidity.",
+				"avgOverTime": {
+					"description": "Average value of relative humidity (water vapour in air) for last 15 minutes.",
+					"unitCode": "P1",
+					"unitText": "percent",
+					"type": ["ValueDescriptor"],
+					"aggregationDuration": {
+						"unitCode": "MIN",
+						"value": 15,
+						"unitText": "minutes"
+					},
+					"dataSchema": "iudx:Number"
+				},
+				"type": ["TimeSeriesAggregation"]
+			},
+			"dataDescriptorLabel": "Data Descriptor for data from Bosch-climo AQM sensors in Pune city.",
+			"atmosphericPressure": {
+				"description": "Describes instantaneous and/or aggregated values for atmospheric pressure.",
+				"avgOverTime": {
+					"description": "Average value of air pressure for the last 15 minutes",
+					"unitCode": "ATM",
+					"unitText": "standard atmosphere (atm)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": {
+						"unitCode": "MIN",
+						"value": 15,
+						"unitText": "minutes"
+					},
+					"type": ["ValueDescriptor"]
+				},
+				"type": ["TimeSeriesAggregation"]
+			},
+			"observationDateTime": {
+				"description": "Last reported time of observation.",
+				"dataSchema": "iudx:DateTime",
+				"type": ["ValueDescriptor"]
+			},
+			"pm2p5": {
+				"description": "Describes instantaneous and/or aggregated values for particulate matter 2.5(PM2.5).",
+				"maxOverTime": {
+					"description": "Maximum value of PM2.5 for the last 24 hours",
+					"unitCode": "GQ",
+					"unitText": "micro gram per cubic metre (ug/m3)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"avgOverTime": {
+					"description": "Average value of PM2.5 for the last 15 minutes",
+					"unitCode": "GQ",
+					"unitText": "micro gram per cubic metre (ug/m3)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": {
+						"unitCode": "MIN",
+						"value": 15,
+						"unitText": "minutes"
+					},
+					"type": ["ValueDescriptor"]
+				},
+				"minOverTime": {
+					"description": "Maximum value of PM2.5 for the last 24 hours",
+					"unitCode": "GQ",
+					"unitText": "micro gram per cubic metre (ug/m3)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"type": ["TimeSeriesAggregation"]
+			},
+			"co": {
+				"description": "Describes instantaneous and/or aggregated values for carbon monooxide(CO).",
+				"maxOverTime": {
+					"description": "Maximum value of CO for the last 24 hours",
+					"unitCode": "59",
+					"unitText": "part per million (ppm)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"avgOverTime": {
+					"description": "Average value of CO for the last 24 hours",
+					"unitCode": "59",
+					"unitText": "part per million (ppm)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": {
+						"unitCode": "MIN",
+						"value": 15,
+						"unitText": "minutes"
+					},
+					"type": ["ValueDescriptor"]
+				},
+				"minOverTime": {
+					"description": "Maximum value of CO for the last 24 hours",
+					"unitCode": "59",
+					"unitText": "part per million (ppm)",
+					"dataSchema": "iudx:Number",
+					"aggregationDuration": 24,
+					"type": ["ValueDescriptor"]
+				},
+				"type": ["TimeSeriesAggregation"]
+			},
+			"deviceStatus": {
+				"description": "Status of the device. Whether connected or not connected.",
+				"dataSchema": "iudx:Text",
+				"type": ["ValueDescriptor"]
+			},
+			"aqiMajorPollutant": {
+				"description": "Major pollutant in the Air Quality Index (AQI).",
+				"dataSchema": "iudx:Text",
+				"type": ["ValueDescriptor"]
+			}
+		},
+		"dataSample": {
+			"so2": {
+				"avgOverTime": 3.65
+			},
+			"airQualityIndex": 90,
+			"pm10": {
+				"avgOverTime": 16.71
+			},
+			"illuminance": {
+				"avgOverTime": 3319.41
+			},
+			"co2": {
+				"avgOverTime": 318.51
+			},
+			"uv": {
+				"avgOverTime": 0.81
+			},
+			"o3": {
+				"avgOverTime": 9.6
+			},
+			"relativeHumidity": {
+				"avgOverTime": 71.29
+			},
+			"ambientNoise": {
+				"avgOverTime": 61.06
+			},
+			"airQualityLevel": "SATISFATORY",
+			"no2": {
+				"avgOverTime": 6.59
+			},
+			"airTemperature": {
+				"avgOverTime": 27.76
+			},
+			"atmosphericPressure": {
+				"avgOverTime": 0.92
+			},
+			"observationDateTime": "2020-09-16T11:00:00+05:30",
+			"pm2p5": {
+				"avgOverTime": 9.05
+			},
+			"co": {
+				"avgOverTime": 1.54
+			},
+			"deviceStatus": "ACTIVE",
+			"aqiMajorPollutant": "no2"
+		},
+		"dataSampleFile": "https://file.iudx.org.in/iudx/v1/download?file-id=datakaveri.org/04a15c9960ffda227e9546f3f46e629e1fe4132b/rs.iudx.org.in/pune-env-aqm/sample.json",
+		"description": "Air quality monitoring devices/sensors measure ambient pollutants and are an integral part of most smart city deployments.  IUDX provides realtime and historical data for Pune Air Quality Sensors publicly (Free to consume). In this sandbox, we illustrate the consumption of this datasource and perform some interesting analytics on the data such as a realtime geo-spatio-temporal view of the pollution levels in the city and also attempt to predict pollution levels temporally and spatially. Find more information about this resource  <u><a href=\"https://catalogue.iudx.org.in/dataset/datakaveri.org-04a15c9960ffda227e9546f3f46e629e1fe4132b-rs.iudx.org.in-pune-env-aqm\" target=\"_blank\">here</a></u>. <br/>  <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-aqm/main/docs/climo.jpg\" alt=\"AQM Device\" height=\"200\" width=\"300\"/> <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-aqm/main/docs/analytic1.png\" alt=\"AQM Device\" height=\"200\" width=\"300\"/>.",
+		"domain": "Environment",
+		"icon": "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png",
+		"instance": "sandbox",
+		"itemCreatedAt": "2022-03-24T23:29:55.000Z",
+		"itemStatus": "ACTIVE",
+		"iudxResourceAPIs": ["ATTR", "TEMPORAL"],
+		"label": "Pune Air Quality Monitoring Sensors",
+		"location": {
+			"address": "Pune, Maharashtra",
+			"type": "Place"
+		},
+		"name": "pune-env-aqm",
+		"provider": {
+			"_id": "62387a479072f13ab80be4b9",
+			"description": "Sandbox Admin"
+		},
+		"referenceResources": [
+			{
+				"id": "datakaveri.org/04a15c9960ffda227e9546f3f46e629e1fe4132b/rs.iudx.org.in/pune-env-aqm",
+				"name": "Pune Air Quality Monitoring Sensors",
+				"description": "Air quality monitoring devices/sensors in Pune city",
+				"additionalInfoURL": "https://catalogue.iudx.org.in/dataset/datakaveri.org-04a15c9960ffda227e9546f3f46e629e1fe4132b-rs.iudx.org.in-pune-env-aqm"
+			}
+		],
+		"repositoryURL": "https://github.com/datakaveri/sandbox-aqm.git",
+		"resourceServer": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in",
+		"resourceType": "MESSAGESTREAM",
+		"resources": 2,
+		"schema": "https://voc.iudx.org.in/EnvAQM",
+		"tags": [
+			"environment",
+			"air quality",
+			"climate",
+			"air",
+			"aqi",
+			"aqm",
+			"climo",
+			"pollution",
+			"so2",
+			"co2",
+			"co",
+			"no",
+			"no2",
+			"pm2.5",
+			"pm10",
+			"humidity",
+			"temperature",
+			"ozone",
+			"o3",
+			"noise",
+			"light",
+			"uv"
+		],
+		"type": ["iudx:ResourceGroup", "iudx:EnvAQM"],
+		"unique_id": "datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-pune-env-aqm",
+		"updatedAt": "2023-05-22T07:00:00.848Z",
+		"views": 73
+	},
+	{
+		"_id": "633e672e9072f13ab845be89",
+		"id": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/surat-itms-dp-1",
+		"@context": "https://voc.iudx.org.in/",
+		"__v": 0,
+		"accessPolicy": "OPEN",
+		"createdAt": "2022-10-06T05:27:10.290Z",
+		"description": " In this notebook we consider the problem of Differentially Private release of statistics for an underlying data set. In particular, we consider an intelligent transport management system (ITMS) dataset which consists of records generated from transit buses operating in the city. The parameters reported by the buses include licence plate number, instantaneous speed, location coordinates (latitude and longitude), and observation Date-Time. The key goal is to release useful statistics, such as average speed and number of speed limit violations, about this dataset in such a way that the privacy of the users (drivers) is not compromised. We adopt the notion of differential privacy for this task, which is currently a widely accepted notion of privacy underlying several well-known privacy-preserving data releases and frameworks. On a high level, differential privacy provides plausible deniability to users whose data is being used to compute the statistics in the sense that the presence or absence of any user in the dataset does not change the statistic by much.  <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-itms-dp-1/main/docs/illustration.jpg\" alt=\"Smart Buses\" height=\"200\" width=\"300\"/> \t <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-itms-dp-1/main/docs/analytic1.jpg\" alt=\"Analytic1\" height=\"200\" width=\"300\"/>",
+		"domain": "UrbanMobility",
+		"icon": "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png",
+		"instance": "sandbox",
+		"itemCreatedAt": "2022-08-11T22:06:29.000Z",
+		"itemStatus": "ACTIVE",
+		"iudxResourceAPIs": ["ATTR", "TEMPORAL"],
+		"label": "Differential Privacy with Surat Transit Management System",
+		"location": {
+			"address": "Surat",
+			"type": "Place"
+		},
+		"name": "surat-itms-dp-1",
+		"provider": {
+			"_id": "62387a479072f13ab80be4b9",
+			"description": "Sandbox Admin"
+		},
+		"referenceResources": [
+			{
+				"id": "suratmunicipal.org/6db486cb4f720e8585ba1f45a931c63c25dbbbda/rs.iudx.org.in/surat-itms-additional-info",
+				"name": "Static Transit Management data",
+				"description": "GTFS based static information of buses such as stops, routes, etc.",
+				"additionalInfoURL": "https://catalogue.iudx.org.in/dataset/suratmunicipal.org-6db486cb4f720e8585ba1f45a931c63c25dbbbda-rs.iudx.org.in-surat-itms-additional-info"
+			},
+			{
+				"id": "suratmunicipal.org/6db486cb4f720e8585ba1f45a931c63c25dbbbda/rs.iudx.org.in/surat-itms-realtime-info",
+				"name": "Realtime Transit Management data",
+				"description": "Real time bus positions and daily trip schedules",
+				"additionalInfoURL": "https://catalogue.iudx.org.in/dataset/suratmunicipal.org-6db486cb4f720e8585ba1f45a931c63c25dbbbda-rs.iudx.org.in-surat-itms-realtime-info"
+			}
+		],
+		"repositoryURL": "https://github.com/datakaveri/sandbox-itms-dp-1.git",
+		"resourceServer": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in",
+		"resourceType": "MESSAGESTREAM",
+		"resources": 1,
+		"schema": "https://voc.iudx.org.in/TransitManagement",
+		"tags": [
+			"itms",
+			"mobility",
+			"vehicle",
+			"transport",
+			"buses",
+			"gtfs",
+			"commute",
+			"route",
+			"bus tracking"
+		],
+		"type": ["iudx:ResourceGroup", "iudx:TransitManagement"],
+		"unique_id": "datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-surat-itms-dp-1",
+		"updatedAt": "2023-05-22T07:00:00.868Z",
+		"views": 64
+	},
+	{
+		"_id": "6421becf9072f13ab87bcb68",
+		"id": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/bangalore-dem",
+		"@context": "https://voc.iudx.org.in/",
+		"__v": 0,
+		"accessPolicy": "OPEN",
+		"createdAt": "2023-03-27T16:05:35.496Z",
+		"description": "In this notebook, we illustrate the use of GSX and the OGC Coverages api to download raster files for Digital Elevation Model of an area around Bangalore. In addition, we illustrate the use of an open source library to handle multi dimensional raster bands and display the elevation model.",
+		"domain": "GeoSpatialInfo",
+		"icon": "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png",
+		"instance": "sandbox",
+		"itemCreatedAt": "2021-07-05T06:35:26.000Z",
+		"itemStatus": "ACTIVE",
+		"iudxResourceAPIs": ["ATTR", "TEMPORAL"],
+		"label": "Digital Elevation Model of Bangalore through GSX",
+		"location": {
+			"address": "Bangalore",
+			"type": "Place"
+		},
+		"name": "bangalore-dem",
+		"provider": {
+			"_id": "62387a479072f13ab80be4b9",
+			"description": "Sandbox Admin"
+		},
+		"referenceResources": [
+			{
+				"id": "datakaveri.org/254ee63ac91d837f550784d6512990e23d30549b/soi.iudx.io/digital_elevation_bengaluru",
+				"name": "Digital Elevation Models of Bangalore",
+				"description": "OGC Coverage Resource for Bangalore DEM",
+				"additionalInfoURL": "https://catalogue.gsx.iudx.io/dataset/datakaveri.org-254ee63ac91d837f550784d6512990e23d30549b-soi.iudx.io-digital_elevation_bengaluru"
+			}
+		],
+		"repositoryURL": "https://github.com/datakaveri/sandbox-bangalore-dem",
+		"resourceServer": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in",
+		"resourceType": "MESSAGESTREAM",
+		"resources": 0,
+		"schema": "https://voc.iudx.org.in/DigitalElevationModel",
+		"tags": ["digital elevation model"],
+		"type": ["iudx:ResourceGroup", "iudx:DigitalElevationModel"],
+		"unique_id": "datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-bangalore-dem",
+		"updatedAt": "2023-05-22T07:00:00.985Z",
+		"views": 29
+	},
+	{
+		"_id": "6421eb839072f13ab87be14f",
+		"id": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/bangalore-features",
+		"@context": "https://voc.iudx.org.in/",
+		"__v": 0,
+		"accessPolicy": "OPEN",
+		"createdAt": "2023-03-27T19:16:19.542Z",
+		"description": "In this notebook, we illustrate the use of GSX and the OGC Features api to access Feature Layers in Bangalore such as Water bodies, buildings, etc. In addition, we illustrate the use of an open source library to handle this GeoJSON based feature data. \n\n <br/>  <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-bangalore-features/master/docs/foi1.jpg\" alt=\"FOI\" height=\"400\" width=\"600\"/>",
+		"domain": "",
+		"icon": "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png",
+		"instance": "sandbox",
+		"itemCreatedAt": "2021-07-05T06:35:26.000Z",
+		"itemStatus": "ACTIVE",
+		"iudxResourceAPIs": ["ATTR", "TEMPORAL"],
+		"label": "Features of Interest in Bangalore",
+		"location": {
+			"address": "Bangalore",
+			"type": "Place"
+		},
+		"name": "bangalore-features",
+		"provider": {
+			"_id": "62387a479072f13ab80be4b9",
+			"description": "Sandbox Admin"
+		},
+		"referenceResources": [
+			{
+				"id": "datakaveri.org/254ee63ac91d837f550784d6512990e23d30549b/soi.iudx.io/bangalore_features_of_interest",
+				"name": "Features of Interest in Bangalore",
+				"description": "OGC Features Resource for Bangalore",
+				"additionalInfoURL": "https://catalogue.gsx.iudx.io/dataset/datakaveri.org-254ee63ac91d837f550784d6512990e23d30549b-soi.iudx.io-bangalore_features_of_interest"
+			}
+		],
+		"repositoryURL": "https://github.com/datakaveri/sandbox-bangalore-features.git",
+		"resourceServer": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in",
+		"resourceType": "MESSAGESTREAM",
+		"resources": 0,
+		"schema": "https://voc.iudx.org.in/Features",
+		"tags": ["features", "lakes", "rivers", "buildings"],
+		"type": ["iudx:ResourceGroup", "iudx:Features"],
+		"unique_id": "datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-bangalore-features",
+		"updatedAt": "2023-05-22T07:00:01.026Z",
+		"views": 27
+	},
+	{
+		"_id": "642211e09072f13ab87bed81",
+		"id": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/bangalore-foi",
+		"@context": "https://voc.iudx.org.in/",
+		"__v": 0,
+		"accessPolicy": "OPEN",
+		"createdAt": "2023-03-27T22:00:00.977Z",
+		"description": "In this notebook, we illustrate the use of GSX and the OGC Features api to access Feature Layers in Bangalore such as Water bodies, buildings, etc. In addition, we illustrate the use of an open source library to handle this GeoJSON based feature data. \n\n <br/>  <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-bangalore-foi/master/docs/foi1.jpg\" alt=\"FOI\" height=\"400\" width=\"600\"/>",
+		"domain": "",
+		"icon": "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png",
+		"instance": "sandbox",
+		"itemCreatedAt": "2021-07-05T06:35:26.000Z",
+		"itemStatus": "ACTIVE",
+		"iudxResourceAPIs": ["ATTR", "TEMPORAL"],
+		"label": "Features of Interest in Bangalore",
+		"location": {
+			"address": "Bangalore",
+			"type": "Place"
+		},
+		"name": "bangalore-foi",
+		"provider": {
+			"_id": "62387a479072f13ab80be4b9",
+			"description": "Sandbox Admin"
+		},
+		"referenceResources": [
+			{
+				"id": "datakaveri.org/254ee63ac91d837f550784d6512990e23d30549b/soi.iudx.io/bangalore_features_of_interest",
+				"name": "Features of Interest in Bangalore",
+				"description": "OGC Features Resource for Bangalore",
+				"additionalInfoURL": "https://catalogue.gsx.iudx.io/dataset/datakaveri.org-254ee63ac91d837f550784d6512990e23d30549b-soi.iudx.io-bangalore_features_of_interest"
+			}
+		],
+		"repositoryURL": "https://github.com/datakaveri/sandbox-bangalore-foi.git",
+		"resourceServer": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in",
+		"resourceType": "MESSAGESTREAM",
+		"resources": 0,
+		"schema": "https://voc.iudx.org.in/Features",
+		"tags": ["features", "lakes", "rivers", "buildings"],
+		"type": ["iudx:ResourceGroup", "iudx:Features"],
+		"unique_id": "datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-bangalore-foi",
+		"updatedAt": "2023-05-22T07:00:01.011Z",
+		"views": 10
+	}
+]

@@ -1,0 +1,1441 @@
+openapi: 3.0.0
+x-stoplight:
+    id: 4l3mn4yujdqnq
+info:
+    title: IUDX Sandbox Backend
+    version: "1.0"
+    description: |
+        The IUDX Sandbox is a JupyterHub based platform where users of IUDX can
+
+        1. Download sample historical data for datasets
+        2. Explore IUDX curated notebooks of interesting use cases
+        3. Interactively perform data analytics on these IUDX live/historical datasets
+    contact:
+        name: ""
+    license:
+        name: ""
+servers:
+    - url: "http://localhost:8080"
+      description: localhost
+paths:
+    /api/datasets:
+        get:
+            summary: List datasets
+            tags:
+                - dataset
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    Id:
+                                        type: string
+                                    AccessPolicy:
+                                        type: string
+                                    Description:
+                                        type: string
+                                    Domain:
+                                        type: string
+                                    Icon:
+                                        type: string
+                                    IUDXResourceAPIs:
+                                        type: array
+                                        items:
+                                            type: string
+                                    Label:
+                                        type: string
+                                    Name:
+                                        type: string
+                                    Provider:
+                                        type: object
+                                        properties:
+                                            _id:
+                                                type: string
+                                            description:
+                                                type: string
+                                    RepositoryURL:
+                                        type: string
+                                    Tags:
+                                        type: array
+                                        items:
+                                            type: string
+                                    Type:
+                                        type: array
+                                        items:
+                                            type: string
+                                    Unique_id:
+                                        type: string
+                                    Resources:
+                                        type: integer
+                                    Instance:
+                                        type: string
+                                x-examples:
+                                    Example 1:
+                                        Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm
+                                        AccessPolicy: OPEN
+                                        Description: |-
+                                            Solid waste management in smart city contexts involves waste collecting containers (bins) and waste collecting vehicles. Bins are fitted with sensors to monitor the realtime volume (or level) of waste contained within it and the details of the last collected time and vehicle which serviced it. Vehicles are fitted with GPS sensors that report the latest location along with the license_plate (identifier) of that particular vehicle.  This sandbox shows analytics such as - 
+                                             1. Distrubtion of bins across the city 
+                                             2. Regions in which the vehicles ply 
+                                             3. Derived schedules and routes of vehicles and temporal trends 
+                                             4. Bins which are not serviced by any vehicles. <br/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/varanasiswm.jpg" alt="SWM depiction" height="200" width="300"/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic1.png" alt="Analytic1" height="200" width="300"/> <br/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic2.png" alt="Analytic2" height="200" width="300"/>
+                                        Domain: ""
+                                        Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                        IUDXResourceAPIs:
+                                            - ATTR
+                                            - TEMPORAL
+                                        Label: Varanasi Solid Waste Management
+                                        Name: varanasi-swm
+                                        Provider:
+                                            _id: 62387a479072f13ab80be4b9
+                                            description: Sandbox Admin
+                                        RepositoryURL: "https://github.com/datakaveri/sandbox-swm.git"
+                                        Tags:
+                                            - dustbin
+                                            - dustbin level
+                                            - solid waste management
+                                            - waste vehicle
+                                            - waste dump
+                                            - tracking
+                                            - capacity
+                                            - pickup time
+                                            - cleaned time
+                                        Type:
+                                            - "iudx:ResourceGroup"
+                                            - "iudx:WasteManagement"
+                                        Unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                        Resources: 9
+                                        Instance: sandbox
+                            examples:
+                                Example:
+                                    value:
+                                        type: success
+                                        title: List of all datasets
+                                        results:
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm
+                                              AccessPolicy: OPEN
+                                              Description: |-
+                                                  Solid waste management in smart city contexts involves waste collecting containers (bins) and waste collecting vehicles. Bins are fitted with sensors to monitor the realtime volume (or level) of waste contained within it and the details of the last collected time and vehicle which serviced it. Vehicles are fitted with GPS sensors that report the latest location along with the license_plate (identifier) of that particular vehicle.  This sandbox shows analytics such as - 
+                                                   1. Distrubtion of bins across the city 
+                                                   2. Regions in which the vehicles ply 
+                                                   3. Derived schedules and routes of vehicles and temporal trends 
+                                                   4. Bins which are not serviced by any vehicles. <br/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/varanasiswm.jpg" alt="SWM depiction" height="200" width="300"/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic1.png" alt="Analytic1" height="200" width="300"/> <br/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic2.png" alt="Analytic2" height="200" width="300"/>
+                                              Domain: ""
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              IUDXResourceAPIs:
+                                                  - ATTR
+                                                  - TEMPORAL
+                                              Label: Varanasi Solid Waste Management
+                                              Name: varanasi-swm
+                                              Provider:
+                                                  _id: 62387a479072f13ab80be4b9
+                                                  description: Sandbox Admin
+                                              RepositoryURL: "https://github.com/datakaveri/sandbox-swm.git"
+                                              Tags:
+                                                  - dustbin
+                                                  - dustbin level
+                                                  - solid waste management
+                                                  - waste vehicle
+                                                  - waste dump
+                                                  - tracking
+                                                  - capacity
+                                                  - pickup time
+                                                  - cleaned time
+                                              Type:
+                                                  - "iudx:ResourceGroup"
+                                                  - "iudx:WasteManagement"
+                                              Unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Resources: 9
+                                              Instance: sandbox
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/bangalore-ambulance
+                                              AccessPolicy: OPEN
+                                              Description: |2-
+                           Real-time positions of ambulances (both motorcycle and full-fledged) can be used to derive interesting insights into a city such as 
+                           1. Accident prone zones 
+                           2. Ambulance congestion patterns. In this sandbox, we illustrate the usage of this datasource and highlight some interesting insights that can be derived from it. 
+
+                           <br/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-ambulance/main/docs/ambulance.jpg" alt="GVK Ambulance" height="200" width="300"/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-ambulance/main/docs/analytic1.png" alt="Analytic1" height="200" width="300"/>
+                                              Domain: UrbanMobility
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              IUDXResourceAPIs:
+                                                  - ATTR
+                                                  - TEMPORAL
+                                              Label: Bangalore Ambulance Tracking
+                                              Name: bangalore-ambulance
+                                              Provider:
+                                                  _id: 62387a479072f13ab80be4b9
+                                                  description: Sandbox Admin
+                                              RepositoryURL: "https://github.com/datakaveri/sandbox-ambulance.git"
+                                              Tags:
+                                                  - ambulance
+                                                  - motor cycle ambulance
+                                                  - bike ambulance
+                                                  - emergency vehicle
+                                                  - license plate
+                                                  - sos
+                                                  - on call
+                                                  - emergency service
+                                                  - patient
+                                                  - hospital
+                                                  - on duty
+                                                  - help
+                                                  - siren
+                                                  - emergency transit
+                                                  - make way
+                                                  - green corridor
+                                              Type:
+                                                  - "iudx:ResourceGroup"
+                                                  - "iudx:EmergencyVehicle"
+                                              Unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-bangalore-ambulance
+                                              Resources: 6
+                                              Instance: sandbox
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/surat-itms
+                                              AccessPolicy: OPEN
+                                              Description: |-
+                                                  Surat transit management datasource is a rich and comprehensive GTFS based data stream of public transit operations in the city.  In this sandbox we show analysis on stop-to-stop coverage, temporal and spatial schedule-to-live conformance and show some intuitive and interactive plots to give a wholistic understanding on transit management systems. 
+
+                                                   <br/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-itms/main/docs/illustration.jpg" alt="Smart Buses" height="200" width="300"/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-itms/main/docs/analytic1.png" alt="Analytic1" height="200" width="300"/> 
+
+                                                   <img src="https://raw.githubusercontent.com/datakaveri/sandbox-itms/main/docs/analytic2.png" alt="Analytic2" height="200" width="300"/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-itms/main/docs/analytic3.png" alt="Analytic3" height="200" width="300"/>
+                                              Domain: UrbanMobility
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              IUDXResourceAPIs:
+                                                  - ATTR
+                                                  - TEMPORAL
+                                              Label: Surat Transit Management System
+                                              Name: surat-itms
+                                              Provider:
+                                                  _id: 62387a479072f13ab80be4b9
+                                                  description: Sandbox Admin
+                                              RepositoryURL: "https://github.com/datakaveri/sandbox-itms.git"
+                                              Tags:
+                                                  - itms
+                                                  - mobility
+                                                  - vehicle
+                                                  - transport
+                                                  - buses
+                                                  - gtfs
+                                                  - commute
+                                                  - route
+                                                  - bus tracking
+                                              Type:
+                                                  - "iudx:ResourceGroup"
+                                                  - "iudx:TransitManagement"
+                                              Unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-surat-itms
+                                              Resources: 3
+                                              Instance: sandbox
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/bangalore-streetlights
+                                              AccessPolicy: OPEN
+                                              Description: |2-
+                           Locations of streetlights in Bangalore (Electronic City) is analysed to show areas with deficient streetlighting. This is an important aspect of pedestrian and womens safety. Energy consumption from these streetlights are also available and their statistics is shown.    
+
+                           <br/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-streetlight/main/docs/streetlight.jpeg" alt="Elcita Streetlight" height="200" width="300"/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-streetlight/main/docs/analytic1.png" alt="Analytic1" height="200" width="300"/>
+                                              Domain: StreetLight
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              IUDXResourceAPIs:
+                                                  - ATTR
+                                                  - TEMPORAL
+                                              Label: Bangalore Streetlighting
+                                              Name: bangalore-streetlights
+                                              Provider:
+                                                  _id: 62387a479072f13ab80be4b9
+                                                  description: Sandbox Admin
+                                              RepositoryURL: "https://github.com/datakaveri/sandbox-streetlight.git"
+                                              Tags:
+                                                  - streetlight
+                                                  - lamp post
+                                                  - location
+                                                  - street light
+                                                  - street lamp
+                                                  - light pole
+                                              Type:
+                                                  - "iudx:ResourceGroup"
+                                                  - "iudx:Streetlight"
+                                              Unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-bangalore-streetlights
+                                              Resources: 2
+                                              Instance: sandbox
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/pune-env-aqm
+                                              AccessPolicy: OPEN
+                                              Description: 'Air quality monitoring devices/sensors measure ambient pollutants and are an integral part of most smart city deployments.  IUDX provides realtime and historical data for Pune Air Quality Sensors publicly (Free to consume). In this sandbox, we illustrate the consumption of this datasource and perform some interesting analytics on the data such as a realtime geo-spatio-temporal view of the pollution levels in the city and also attempt to predict pollution levels temporally and spatially. Find more information about this resource  <u><a href="https://catalogue.iudx.org.in/dataset/datakaveri.org-04a15c9960ffda227e9546f3f46e629e1fe4132b-rs.iudx.org.in-pune-env-aqm" target="_blank">here</a></u>. <br/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-aqm/main/docs/climo.jpg" alt="AQM Device" height="200" width="300"/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-aqm/main/docs/analytic1.png" alt="AQM Device" height="200" width="300"/>.'
+                                              Domain: Environment
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              IUDXResourceAPIs:
+                                                  - ATTR
+                                                  - TEMPORAL
+                                              Label: Pune Air Quality Monitoring Sensors
+                                              Name: pune-env-aqm
+                                              Provider:
+                                                  _id: 62387a479072f13ab80be4b9
+                                                  description: Sandbox Admin
+                                              RepositoryURL: "https://github.com/datakaveri/sandbox-aqm.git"
+                                              Tags:
+                                                  - environment
+                                                  - air quality
+                                                  - climate
+                                                  - air
+                                                  - aqi
+                                                  - aqm
+                                                  - climo
+                                                  - pollution
+                                                  - so2
+                                                  - co2
+                                                  - co
+                                                  - "no"
+                                                  - no2
+                                                  - pm2.5
+                                                  - pm10
+                                                  - humidity
+                                                  - temperature
+                                                  - ozone
+                                                  - o3
+                                                  - noise
+                                                  - light
+                                                  - uv
+                                              Type:
+                                                  - "iudx:ResourceGroup"
+                                                  - "iudx:EnvAQM"
+                                              Unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-pune-env-aqm
+                                              Resources: 2
+                                              Instance: sandbox
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/surat-itms-dp-1
+                                              AccessPolicy: OPEN
+                                              Description: " In this notebook we consider the problem of Differentially Private release of statistics for an underlying data set. In particular, we consider an intelligent transport management system (ITMS) dataset which consists of records generated from transit buses operating in the city. The parameters reported by the buses include licence plate number, instantaneous speed, location coordinates (latitude and longitude), and observation Date-Time. The key goal is to release useful statistics, such as average speed and number of speed limit violations, about this dataset in such a way that the privacy of the users (drivers) is not compromised. We adopt the notion of differential privacy for this task, which is currently a widely accepted notion of privacy underlying several well-known privacy-preserving data releases and frameworks. On a high level, differential privacy provides plausible deniability to users whose data is being used to compute the statistics in the sense that the presence or absence of any user in the dataset does not change the statistic by much.  <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-itms-dp-1/main/docs/illustration.jpg\" alt=\"Smart Buses\" height=\"200\" width=\"300\"/> \t <img src=\"https://raw.githubusercontent.com/datakaveri/sandbox-itms-dp-1/main/docs/analytic1.jpg\" alt=\"Analytic1\" height=\"200\" width=\"300\"/>"
+                                              Domain: UrbanMobility
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              IUDXResourceAPIs:
+                                                  - ATTR
+                                                  - TEMPORAL
+                                              Label: Differential Privacy with Surat Transit Management System
+                                              Name: surat-itms-dp-1
+                                              Provider:
+                                                  _id: 62387a479072f13ab80be4b9
+                                                  description: Sandbox Admin
+                                              RepositoryURL: "https://github.com/datakaveri/sandbox-itms-dp-1.git"
+                                              Tags:
+                                                  - itms
+                                                  - mobility
+                                                  - vehicle
+                                                  - transport
+                                                  - buses
+                                                  - gtfs
+                                                  - commute
+                                                  - route
+                                                  - bus tracking
+                                              Type:
+                                                  - "iudx:ResourceGroup"
+                                                  - "iudx:TransitManagement"
+                                              Unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-surat-itms-dp-1
+                                              Resources: 1
+                                              Instance: sandbox
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/bangalore-features
+                                              AccessPolicy: OPEN
+                                              Description: |-
+                                                  In this notebook, we illustrate the use of GSX and the OGC Features api to access Feature Layers in Bangalore such as Water bodies, buildings, etc. In addition, we illustrate the use of an open source library to handle this GeoJSON based feature data. 
+
+                                                   <br/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-bangalore-features/master/docs/foi1.jpg" alt="FOI" height="400" width="600"/>
+                                              Domain: ""
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              IUDXResourceAPIs:
+                                                  - ATTR
+                                                  - TEMPORAL
+                                              Label: Features of Interest in Bangalore
+                                              Name: bangalore-features
+                                              Provider:
+                                                  _id: 62387a479072f13ab80be4b9
+                                                  description: Sandbox Admin
+                                              RepositoryURL: "https://github.com/datakaveri/sandbox-bangalore-features.git"
+                                              Tags:
+                                                  - features
+                                                  - lakes
+                                                  - rivers
+                                                  - buildings
+                                              Type:
+                                                  - "iudx:ResourceGroup"
+                                                  - "iudx:Features"
+                                              Unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-bangalore-features
+                                              Resources: 0
+                                              Instance: sandbox
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/bangalore-foi
+                                              AccessPolicy: OPEN
+                                              Description: |-
+                                                  In this notebook, we illustrate the use of GSX and the OGC Features api to access Feature Layers in Bangalore such as Water bodies, buildings, etc. In addition, we illustrate the use of an open source library to handle this GeoJSON based feature data. 
+
+                                                   <br/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-bangalore-foi/master/docs/foi1.jpg" alt="FOI" height="400" width="600"/>
+                                              Domain: ""
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              IUDXResourceAPIs:
+                                                  - ATTR
+                                                  - TEMPORAL
+                                              Label: Features of Interest in Bangalore
+                                              Name: bangalore-foi
+                                              Provider:
+                                                  _id: 62387a479072f13ab80be4b9
+                                                  description: Sandbox Admin
+                                              RepositoryURL: "https://github.com/datakaveri/sandbox-bangalore-foi.git"
+                                              Tags:
+                                                  - features
+                                                  - lakes
+                                                  - rivers
+                                                  - buildings
+                                              Type:
+                                                  - "iudx:ResourceGroup"
+                                                  - "iudx:Features"
+                                              Unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-bangalore-foi
+                                              Resources: 0
+                                              Instance: sandbox
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/bangalore-dem
+                                              AccessPolicy: OPEN
+                                              Description: 'In this notebook, we illustrate the use of GSX and the OGC Coverages api to download raster files for Digital Elevation Model of an area around Bangalore. In addition, we illustrate the use of an open source library to handle multi dimensional raster bands and display the elevation model. <br/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-bangalore-dem/master/docs/dem1.png" alt="DEM" height="400" width="600" />'
+                                              Domain: GeoSpatialInfo
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              IUDXResourceAPIs:
+                                                  - ATTR
+                                                  - TEMPORAL
+                                              Label: Digital Elevation Model of Bangalore through GSX
+                                              Name: bangalore-dem
+                                              Provider:
+                                                  _id: 62387a479072f13ab80be4b9
+                                                  description: Sandbox Admin
+                                              RepositoryURL: "https://github.com/datakaveri/sandbox-bangalore-dem.git"
+                                              Tags:
+                                                  - digital elevation model
+                                              Type:
+                                                  - "iudx:ResourceGroup"
+                                                  - "iudx:DigitalElevationModel"
+                                              Unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-bangalore-dem
+                                              Resources: 0
+                                              Instance: sandbox
+                "412":
+                    description: Precondition Failed
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    failed:
+                                        type: string
+                                        x-stoplight:
+                                            id: o54msuz6645am
+                            examples:
+                                Example:
+                                    value:
+                                        failed: No records found
+                "500":
+                    description: Internal Server Error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    failed:
+                                        type: string
+                                        x-stoplight:
+                                            id: hxx8pl3amxu06
+                            examples:
+                                Example:
+                                    value:
+                                        failed: Internal Server Error
+            operationId: get-datasets
+            x-stoplight:
+                id: r4w8am9l3ul6t
+    /api/dataset:
+        post:
+            summary: Onboard dataset
+            operationId: post-dataset
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    type:
+                                        type: string
+                                    title:
+                                        type: string
+                                    results:
+                                        type: object
+                                        properties:
+                                            Success:
+                                                type: string
+                                x-examples:
+                                    Example 1:
+                                        type: success
+                                        title: Dataset onboarded successfully
+                                        results:
+                                            Success: "True"
+                            examples:
+                                Example 1:
+                                    value:
+                                        type: success
+                                        title: Dataset onboarded successfully
+                                        results:
+                                            Success: "True"
+            x-stoplight:
+                id: jhxze1gpmzf5x
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                id:
+                                    type: string
+                                accessPolicy:
+                                    type: string
+                                description:
+                                    type: string
+                                domain:
+                                    type: string
+                                icon:
+                                    type: string
+                                iudxResourceAPIs:
+                                    type: array
+                                    items:
+                                        type: string
+                                label:
+                                    type: string
+                                name:
+                                    type: string
+                                provider:
+                                    type: object
+                                    properties:
+                                        _id:
+                                            type: string
+                                        description:
+                                            type: string
+                                repositoryURL:
+                                    type: string
+                                tags:
+                                    type: array
+                                    items:
+                                        type: string
+                                type:
+                                    type: array
+                                    items:
+                                        type: string
+                                unique_id:
+                                    type: string
+                                resources:
+                                    type: integer
+                                instance:
+                                    type: string
+                            x-examples:
+                                Example 1:
+                                    id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm_demo1
+                                    accessPolicy: OPEN
+                                    description: |-
+                                        Solid waste management in smart city contexts involves waste collecting containers (bins) and waste collecting vehicles. Bins are fitted with sensors to monitor the realtime volume (or level) of waste contained within it and the details of the last collected time and vehicle which serviced it. Vehicles are fitted with GPS sensors that report the latest location along with the license_plate (identifier) of that particular vehicle.  This sandbox shows analytics such as - 
+                                         1. Distrubtion of bins across the city 
+                                         2. Regions in which the vehicles ply 
+                                         3. Derived schedules and routes of vehicles and temporal trends 
+                                         4. Bins which are not serviced by any vehicles. <br/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/varanasiswm.jpg" alt="SWM depiction" height="200" width="300"/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic1.png" alt="Analytic1" height="200" width="300"/> <br/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic2.png" alt="Analytic2" height="200" width="300"/>
+                                    domain: ""
+                                    icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                    iudxResourceAPIs:
+                                        - ATTR
+                                        - TEMPORAL
+                                    label: Varanasi Solid Waste Management
+                                    name: varanasi-swm
+                                    provider:
+                                        _id: 62387a479072f13ab80be4b9
+                                        description: Sandbox Admin
+                                    repositoryURL: "https://github.com/datakaveri/sandbox-swm.git"
+                                    tags:
+                                        - dustbin
+                                        - dustbin level
+                                        - solid waste management
+                                        - waste vehicle
+                                        - waste dump
+                                        - tracking
+                                        - capacity
+                                        - pickup time
+                                        - cleaned time
+                                    type:
+                                        - "iudx:ResourceGroup"
+                                        - "iudx:WasteManagement"
+                                    unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm_demo1
+                                    resources: 9
+                                    instance: sandbox
+                        examples:
+                            Example 1:
+                                value:
+                                    id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm_demo1
+                                    accessPolicy: OPEN
+                                    description: |-
+                                        Solid waste management in smart city contexts involves waste collecting containers (bins) and waste collecting vehicles. Bins are fitted with sensors to monitor the realtime volume (or level) of waste contained within it and the details of the last collected time and vehicle which serviced it. Vehicles are fitted with GPS sensors that report the latest location along with the license_plate (identifier) of that particular vehicle.  This sandbox shows analytics such as - 
+                                         1. Distrubtion of bins across the city 
+                                         2. Regions in which the vehicles ply 
+                                         3. Derived schedules and routes of vehicles and temporal trends 
+                                         4. Bins which are not serviced by any vehicles. <br/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/varanasiswm.jpg" alt="SWM depiction" height="200" width="300"/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic1.png" alt="Analytic1" height="200" width="300"/> <br/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic2.png" alt="Analytic2" height="200" width="300"/>
+                                    domain: ""
+                                    icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                    iudxResourceAPIs:
+                                        - ATTR
+                                        - TEMPORAL
+                                    label: Varanasi Solid Waste Management
+                                    name: varanasi-swm
+                                    provider:
+                                        _id: 62387a479072f13ab80be4b9
+                                        description: Sandbox Admin
+                                    repositoryURL: "https://github.com/datakaveri/sandbox-swm.git"
+                                    tags:
+                                        - dustbin
+                                        - dustbin level
+                                        - solid waste management
+                                        - waste vehicle
+                                        - waste dump
+                                        - tracking
+                                        - capacity
+                                        - pickup time
+                                        - cleaned time
+                                    type:
+                                        - "iudx:ResourceGroup"
+                                        - "iudx:WasteManagement"
+                                    unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm_demo1
+                                    resources: 9
+                                    instance: sandbox
+            tags:
+                - dataset
+    "/api/dataset/{unique_id}":
+        parameters:
+            - schema:
+                  type: string
+              name: unique_id
+              in: path
+              required: true
+        get:
+            summary: Get dataset by ID
+            tags:
+                - dataset
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    type:
+                                        type: string
+                                    title:
+                                        type: string
+                                    results:
+                                        type: object
+                                        properties:
+                                            Id:
+                                                type: string
+                                            AccessPolicy:
+                                                type: string
+                                            Description:
+                                                type: string
+                                            Domain:
+                                                type: string
+                                            Icon:
+                                                type: string
+                                            IUDXResourceAPIs:
+                                                type: array
+                                                items:
+                                                    type: string
+                                            Label:
+                                                type: string
+                                            Name:
+                                                type: string
+                                            Provider:
+                                                type: object
+                                                properties:
+                                                    _id:
+                                                        type: string
+                                                    description:
+                                                        type: string
+                                            RepositoryURL:
+                                                type: string
+                                            Tags:
+                                                type: array
+                                                items:
+                                                    type: string
+                                            Type:
+                                                type: array
+                                                items:
+                                                    type: string
+                                            Unique_id:
+                                                type: string
+                                            Resources:
+                                                type: integer
+                                            Instance:
+                                                type: string
+                                x-examples:
+                                    Example 1:
+                                        type: success
+                                        title: List of all datasets
+                                        results:
+                                            Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm
+                                            AccessPolicy: OPEN
+                                            Description: |-
+                                                Solid waste management in smart city contexts involves waste collecting containers (bins) and waste collecting vehicles. Bins are fitted with sensors to monitor the realtime volume (or level) of waste contained within it and the details of the last collected time and vehicle which serviced it. Vehicles are fitted with GPS sensors that report the latest location along with the license_plate (identifier) of that particular vehicle.  This sandbox shows analytics such as - 
+                                                 1. Distrubtion of bins across the city 
+                                                 2. Regions in which the vehicles ply 
+                                                 3. Derived schedules and routes of vehicles and temporal trends 
+                                                 4. Bins which are not serviced by any vehicles. <br/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/varanasiswm.jpg" alt="SWM depiction" height="200" width="300"/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic1.png" alt="Analytic1" height="200" width="300"/> <br/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic2.png" alt="Analytic2" height="200" width="300"/>
+                                            Domain: ""
+                                            Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                            IUDXResourceAPIs:
+                                                - ATTR
+                                                - TEMPORAL
+                                            Label: Varanasi Solid Waste Management
+                                            Name: varanasi-swm
+                                            Provider:
+                                                _id: 62387a479072f13ab80be4b9
+                                                description: Sandbox Admin
+                                            RepositoryURL: "https://github.com/datakaveri/sandbox-swm.git"
+                                            Tags:
+                                                - dustbin
+                                                - dustbin level
+                                                - solid waste management
+                                                - waste vehicle
+                                                - waste dump
+                                                - tracking
+                                                - capacity
+                                                - pickup time
+                                                - cleaned time
+                                            Type:
+                                                - "iudx:ResourceGroup"
+                                                - "iudx:WasteManagement"
+                                            Unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                            Resources: 9
+                                            Instance: sandbox
+                            examples:
+                                Example 1:
+                                    value:
+                                        type: success
+                                        title: List of all datasets
+                                        results:
+                                            Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm
+                                            AccessPolicy: OPEN
+                                            Description: |-
+                                                Solid waste management in smart city contexts involves waste collecting containers (bins) and waste collecting vehicles. Bins are fitted with sensors to monitor the realtime volume (or level) of waste contained within it and the details of the last collected time and vehicle which serviced it. Vehicles are fitted with GPS sensors that report the latest location along with the license_plate (identifier) of that particular vehicle.  This sandbox shows analytics such as - 
+                                                 1. Distrubtion of bins across the city 
+                                                 2. Regions in which the vehicles ply 
+                                                 3. Derived schedules and routes of vehicles and temporal trends 
+                                                 4. Bins which are not serviced by any vehicles. <br/>  <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/varanasiswm.jpg" alt="SWM depiction" height="200" width="300"/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic1.png" alt="Analytic1" height="200" width="300"/> <br/> <img src="https://raw.githubusercontent.com/datakaveri/sandbox-swm/main/docs/analytic2.png" alt="Analytic2" height="200" width="300"/>
+                                            Domain: ""
+                                            Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                            IUDXResourceAPIs:
+                                                - ATTR
+                                                - TEMPORAL
+                                            Label: Varanasi Solid Waste Management
+                                            Name: varanasi-swm
+                                            Provider:
+                                                _id: 62387a479072f13ab80be4b9
+                                                description: Sandbox Admin
+                                            RepositoryURL: "https://github.com/datakaveri/sandbox-swm.git"
+                                            Tags:
+                                                - dustbin
+                                                - dustbin level
+                                                - solid waste management
+                                                - waste vehicle
+                                                - waste dump
+                                                - tracking
+                                                - capacity
+                                                - pickup time
+                                                - cleaned time
+                                            Type:
+                                                - "iudx:ResourceGroup"
+                                                - "iudx:WasteManagement"
+                                            Unique_id: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                            Resources: 9
+                                            Instance: sandbox
+            operationId: get-dataset-by-id
+            x-stoplight:
+                id: 3ghdghczyo617
+            requestBody:
+                content: {}
+    "/api/resources/{unique_id}":
+        get:
+            summary: List Resources
+            tags:
+                - resource
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    type:
+                                        type: string
+                                    title:
+                                        type: string
+                                    results:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                Id:
+                                                    type: string
+                                                CreatedAt:
+                                                    type: string
+                                                Dataset:
+                                                    type: string
+                                                Description:
+                                                    type: string
+                                                DownloadURL:
+                                                    type: string
+                                                Icon:
+                                                    type: string
+                                                Instance:
+                                                    type: string
+                                                ItemCreatedAt:
+                                                    type: string
+                                                ItemStatus:
+                                                    type: string
+                                                Label:
+                                                    type: string
+                                                Name:
+                                                    type: string
+                                                Provider:
+                                                    type: string
+                                                ResourceGroup:
+                                                    type: string
+                                                Tags:
+                                                    type: array
+                                                    items:
+                                                        type: object
+                                                        properties: {}
+                                                Type:
+                                                    type: array
+                                                    items:
+                                                        type: string
+                                                UpdatedAt:
+                                                    type: string
+                                x-examples:
+                                    Example 1:
+                                        type: success
+                                        title: List of all resources
+                                        results:
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclefeb21tofeb28
+                                              CreatedAt: "2022-10-06T05:27:10.166Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Feb21-Feb28 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_feb_21_28.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:07Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for February 21 - February 28 2022
+                                              Name: swmvehiclefeb21tofeb28
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.749Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclefeb11tofeb20
+                                              CreatedAt: "2022-10-06T05:27:10.168Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Feb11-Feb20 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_feb_11_20.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:04Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for February 11 - February 20 2022
+                                              Name: swmvehiclefeb11tofeb20
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.751Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclejan21tojan31
+                                              CreatedAt: "2022-10-06T05:27:10.169Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Jan21-Jan31 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_jan_21_31.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:16Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for January 21 - January 31 2022
+                                              Name: swmvehiclejan21tojan31
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.753Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclejan11tojan20
+                                              CreatedAt: "2022-10-06T05:27:10.171Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Jan11-Jan20 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_jan_11_20.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:10Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for January 11 - January 20 2022
+                                              Name: swmvehiclejan11tojan20
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.755Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclefeb1tofeb10
+                                              CreatedAt: "2022-10-06T05:27:10.172Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Feb1-Feb10 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_feb_1_10.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:01Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for February 1 - February 10 2022
+                                              Name: swmvehiclefeb1tofeb10
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.756Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclejan1tojan10
+                                              CreatedAt: "2022-10-06T05:27:10.173Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Jan1-Jan10 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_jan_1_10.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:13Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for January 1 - January 10 2022
+                                              Name: swmvehiclejan1tojan10
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.758Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclemar11tomar20
+                                              CreatedAt: "2022-10-06T05:27:10.174Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Mar11-Mar20 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_mar_11_20.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:20Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for March 11 - March 20 2022
+                                              Name: swmvehiclemar11tomar20
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.759Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclemar1tomar10
+                                              CreatedAt: "2022-10-06T05:27:10.175Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Mar1-Mar10 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_mar_1_10.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:23Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for March 1 - March 10 2022
+                                              Name: swmvehiclemar1tomar10
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.76Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmwastebinpositions
+                                              CreatedAt: "2022-10-06T05:27:10.177Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Bin position details
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_bin.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:26Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Waste bin positions
+                                              Name: swmwastebinpositions
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.762Z"
+                            examples:
+                                Example 1:
+                                    value:
+                                        type: success
+                                        title: List of all resources
+                                        results:
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclefeb21tofeb28
+                                              CreatedAt: "2022-10-06T05:27:10.166Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Feb21-Feb28 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_feb_21_28.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:07Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for February 21 - February 28 2022
+                                              Name: swmvehiclefeb21tofeb28
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.749Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclefeb11tofeb20
+                                              CreatedAt: "2022-10-06T05:27:10.168Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Feb11-Feb20 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_feb_11_20.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:04Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for February 11 - February 20 2022
+                                              Name: swmvehiclefeb11tofeb20
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.751Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclejan21tojan31
+                                              CreatedAt: "2022-10-06T05:27:10.169Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Jan21-Jan31 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_jan_21_31.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:16Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for January 21 - January 31 2022
+                                              Name: swmvehiclejan21tojan31
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.753Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclejan11tojan20
+                                              CreatedAt: "2022-10-06T05:27:10.171Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Jan11-Jan20 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_jan_11_20.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:10Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for January 11 - January 20 2022
+                                              Name: swmvehiclejan11tojan20
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.755Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclefeb1tofeb10
+                                              CreatedAt: "2022-10-06T05:27:10.172Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Feb1-Feb10 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_feb_1_10.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:01Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for February 1 - February 10 2022
+                                              Name: swmvehiclefeb1tofeb10
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.756Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclejan1tojan10
+                                              CreatedAt: "2022-10-06T05:27:10.173Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Jan1-Jan10 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_jan_1_10.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:13Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for January 1 - January 10 2022
+                                              Name: swmvehiclejan1tojan10
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.758Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclemar11tomar20
+                                              CreatedAt: "2022-10-06T05:27:10.174Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Mar11-Mar20 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_mar_11_20.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:20Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for March 11 - March 20 2022
+                                              Name: swmvehiclemar11tomar20
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.759Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclemar1tomar10
+                                              CreatedAt: "2022-10-06T05:27:10.175Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Archive for the period Mar1-Mar10 2022
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_mar_1_10.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:23Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Vehicle Positions for March 1 - March 10 2022
+                                              Name: swmvehiclemar1tomar10
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.76Z"
+                                            - Id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmwastebinpositions
+                                              CreatedAt: "2022-10-06T05:27:10.177Z"
+                                              Dataset: 633e672e9072f13ab845be30
+                                              Description: Bin position details
+                                              DownloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_bin.parquet"
+                                              Icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                              Instance: sandbox
+                                              ItemCreatedAt: "2022-03-28T01:19:26Z"
+                                              ItemStatus: ACTIVE
+                                              Label: Waste bin positions
+                                              Name: swmwastebinpositions
+                                              Provider: 62387a479072f13ab80be4b9
+                                              ResourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                              Tags: []
+                                              Type:
+                                                  - "iudx:Resource"
+                                                  - "iudx:WasteManagement"
+                                              UpdatedAt: "2023-05-28T16:00:00.762Z"
+            operationId: get-resources
+            x-stoplight:
+                id: 16s18pynrr5fa
+        parameters:
+            - schema:
+                  type: string
+              name: unique_id
+              in: path
+              required: true
+    /api/resource:
+        post:
+            summary: Onboard resource
+            operationId: post-resource
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    type:
+                                        type: string
+                                    title:
+                                        type: string
+                                    results:
+                                        type: object
+                                        properties:
+                                            Success:
+                                                type: string
+                                x-examples:
+                                    Example 1:
+                                        type: success
+                                        title: Resource onboarded successfully
+                                        results:
+                                            Success: "True"
+                            examples:
+                                Example 1:
+                                    value:
+                                        type: success
+                                        title: Resource onboarded successfully
+                                        results:
+                                            Success: "True"
+            x-stoplight:
+                id: kwhtfifhbglc0
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                id:
+                                    type: string
+                                createdAt:
+                                    type: string
+                                dataset:
+                                    type: string
+                                description:
+                                    type: string
+                                downloadURL:
+                                    type: string
+                                icon:
+                                    type: string
+                                instance:
+                                    type: string
+                                itemCreatedAt:
+                                    type: string
+                                itemStatus:
+                                    type: string
+                                label:
+                                    type: string
+                                name:
+                                    type: string
+                                provider:
+                                    type: string
+                                resourceGroup:
+                                    type: string
+                                tags:
+                                    type: array
+                                    items:
+                                        type: object
+                                        properties: {}
+                                type:
+                                    type: array
+                                    items:
+                                        type: string
+                                updatedAt:
+                                    type: string
+                            x-examples:
+                                Example 1:
+                                    id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclefeb21tofeb28_demo1
+                                    createdAt: "2022-10-06T05:27:10.166Z"
+                                    dataset: 633e672e9072f13ab845be30
+                                    description: Archive for the period Feb21-Feb28 2022
+                                    downloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_feb_21_28.parquet"
+                                    icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                    instance: sandbox
+                                    itemCreatedAt: "2022-03-28T01:19:07Z"
+                                    itemStatus: ACTIVE
+                                    label: Vehicle Positions for February 21 - February 28 2022
+                                    name: swmvehiclefeb21tofeb28
+                                    provider: 62387a479072f13ab80be4b9
+                                    resourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                    tags: []
+                                    type:
+                                        - "iudx:Resource"
+                                        - "iudx:WasteManagement"
+                                    updatedAt: "2023-05-28T16:00:00.749Z"
+                        examples:
+                            Example 1:
+                                value:
+                                    id: datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/cat-sandbox.iudx.org.in/varanasi-swm/swmvehiclefeb21tofeb28_demo1
+                                    createdAt: "2022-10-06T05:27:10.166Z"
+                                    dataset: 633e672e9072f13ab845be30
+                                    description: Archive for the period Feb21-Feb28 2022
+                                    downloadURL: "https://iudx-cat-sandbox-dev.s3.ap-south-1.amazonaws.com/swm-data/varanasi_swm_feb_21_28.parquet"
+                                    icon: "https://iudx-catalogue-assets.s3.ap-south-1.amazonaws.com/instances/default-city.png"
+                                    instance: sandbox
+                                    itemCreatedAt: "2022-03-28T01:19:07Z"
+                                    itemStatus: ACTIVE
+                                    label: Vehicle Positions for February 21 - February 28 2022
+                                    name: swmvehiclefeb21tofeb28
+                                    provider: 62387a479072f13ab80be4b9
+                                    resourceGroup: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                    tags: []
+                                    type:
+                                        - "iudx:Resource"
+                                        - "iudx:WasteManagement"
+                                    updatedAt: "2023-05-28T16:00:00.749Z"
+            tags:
+                - resource
+    "/api/referenceresource/{dataset_id}":
+        get:
+            summary: Get reference resources
+            tags:
+                - referenceresource
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    type:
+                                        type: string
+                                    title:
+                                        type: string
+                                    results:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                Id:
+                                                    type: string
+                                                Name:
+                                                    type: string
+                                                Description:
+                                                    type: string
+                                                AdditionalInfoURL:
+                                                    type: string
+                                                DatasetID:
+                                                    type: string
+                                x-examples:
+                                    Example 1:
+                                        type: success
+                                        title: List of all resources
+                                        results:
+                                            - Id: varanasismartcity.gov.in/62d1f729edd3d2a1a090cb1c6c89356296963d55/rs.iudx.org.in/varanasi-swm-vehicle-live
+                                              Name: Varanasi Solid Waste Management Vehicle Positions
+                                              Description: Real Time location of solid waste management vehicles.
+                                              AdditionalInfoURL: "https://catalogue.iudx.org.in/dataset/varanasismartcity.gov.in-62d1f729edd3d2a1a090cb1c6c89356296963d55-rs.iudx.org.in-varanasi-swm-vehicle-live"
+                                              DatasetID: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                            - Id: varanasismartcity.gov.in/62d1f729edd3d2a1a090cb1c6c89356296963d55/rs.iudx.org.in/varanasi-swm-bin-level
+                                              Name: Varanasi Solid Waste Management Bin Levels
+                                              Description: Real Time waste bin levels of solid waste management containers
+                                              AdditionalInfoURL: "https://catalogue.iudx.org.in/dataset/varanasismartcity.gov.in-62d1f729edd3d2a1a090cb1c6c89356296963d55-rs.iudx.org.in-varanasi-swm-bin-level"
+                                              DatasetID: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                            - Id: varanasismartcity.gov.in/62d1f729edd3d2a1a090cb1c6c89356296963d55/rs.iudx.org.in/varanasi-swm-additional-info
+                                              Name: Varanasi Solid Waste Management Bin Locations
+                                              Description: Locations of waste collection containers in Varanasi
+                                              AdditionalInfoURL: "https://varanasi.catalogue.iudx.org.in/dataset/varanasismartcity.gov.in-62d1f729edd3d2a1a090cb1c6c89356296963d55-rs.iudx.org.in-varanasi-swm-additional-info"
+                                              DatasetID: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                            examples:
+                                Example 1:
+                                    value:
+                                        type: success
+                                        title: List of all resources
+                                        results:
+                                            - Id: varanasismartcity.gov.in/62d1f729edd3d2a1a090cb1c6c89356296963d55/rs.iudx.org.in/varanasi-swm-vehicle-live
+                                              Name: Varanasi Solid Waste Management Vehicle Positions
+                                              Description: Real Time location of solid waste management vehicles.
+                                              AdditionalInfoURL: "https://catalogue.iudx.org.in/dataset/varanasismartcity.gov.in-62d1f729edd3d2a1a090cb1c6c89356296963d55-rs.iudx.org.in-varanasi-swm-vehicle-live"
+                                              DatasetID: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                            - Id: varanasismartcity.gov.in/62d1f729edd3d2a1a090cb1c6c89356296963d55/rs.iudx.org.in/varanasi-swm-bin-level
+                                              Name: Varanasi Solid Waste Management Bin Levels
+                                              Description: Real Time waste bin levels of solid waste management containers
+                                              AdditionalInfoURL: "https://catalogue.iudx.org.in/dataset/varanasismartcity.gov.in-62d1f729edd3d2a1a090cb1c6c89356296963d55-rs.iudx.org.in-varanasi-swm-bin-level"
+                                              DatasetID: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                                            - Id: varanasismartcity.gov.in/62d1f729edd3d2a1a090cb1c6c89356296963d55/rs.iudx.org.in/varanasi-swm-additional-info
+                                              Name: Varanasi Solid Waste Management Bin Locations
+                                              Description: Locations of waste collection containers in Varanasi
+                                              AdditionalInfoURL: "https://varanasi.catalogue.iudx.org.in/dataset/varanasismartcity.gov.in-62d1f729edd3d2a1a090cb1c6c89356296963d55-rs.iudx.org.in-varanasi-swm-additional-info"
+                                              DatasetID: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+            operationId: get-referenceresource
+            x-stoplight:
+                id: up5d9ls96gf0n
+            requestBody:
+                content: {}
+        parameters:
+            - schema:
+                  type: string
+              name: dataset_id
+              in: path
+              required: true
+    /api/referenceresource:
+        post:
+            summary: Onboard reference resource
+            operationId: post-referenceresource
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    type:
+                                        type: string
+                                    title:
+                                        type: string
+                                    results:
+                                        type: object
+                                        properties:
+                                            Success:
+                                                type: string
+                                x-examples:
+                                    Example 1:
+                                        type: success
+                                        title: Reference Resource onboarded successfully
+                                        results:
+                                            Success: "True"
+                            examples:
+                                Example 1:
+                                    value:
+                                        type: success
+                                        title: Reference Resource onboarded successfully
+                                        results:
+                                            Success: "True"
+            x-stoplight:
+                id: gynnx3fladexc
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                Id:
+                                    type: string
+                                Name:
+                                    type: string
+                                Description:
+                                    type: string
+                                AdditionalInfoURL:
+                                    type: string
+                                DatasetID:
+                                    type: string
+                            x-examples:
+                                Example 1:
+                                    Id: varanasismartcity.gov.in/62d1f729edd3d2a1a090cb1c6c89356296963d55/rs.iudx.org.in/varanasi-swm-vehicle-live_demo1
+                                    Name: Varanasi Solid Waste Management Vehicle Positions
+                                    Description: Real Time location of solid waste management vehicles.
+                                    AdditionalInfoURL: "https://catalogue.iudx.org.in/dataset/varanasismartcity.gov.in-62d1f729edd3d2a1a090cb1c6c89356296963d55-rs.iudx.org.in-varanasi-swm-vehicle-live"
+                                    DatasetID: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+                        examples:
+                            Example 1:
+                                value:
+                                    Id: varanasismartcity.gov.in/62d1f729edd3d2a1a090cb1c6c89356296963d55/rs.iudx.org.in/varanasi-swm-vehicle-live_demo1
+                                    Name: Varanasi Solid Waste Management Vehicle Positions
+                                    Description: Real Time location of solid waste management vehicles.
+                                    AdditionalInfoURL: "https://catalogue.iudx.org.in/dataset/varanasismartcity.gov.in-62d1f729edd3d2a1a090cb1c6c89356296963d55-rs.iudx.org.in-varanasi-swm-vehicle-live"
+                                    DatasetID: datakaveri.org-f7e044eee8122b5c87dce6e7ad64f3266afa41dc-cat-sandbox.iudx.org.in-varanasi-swm
+            tags:
+                - referenceresource
+components:
+    schemas: {}
+x-internal: true
+tags:
+    - name: dataset
+    - name: referenceresource
+    - name: resource
