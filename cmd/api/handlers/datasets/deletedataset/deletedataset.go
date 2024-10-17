@@ -1,8 +1,6 @@
-package listdataset
+package deletedataset
 
 import (
-	"database/sql"
-	"errors"
 	"net/http"
 
 	"github.com/iudx-sandbox-backend/cmd/api/models"
@@ -13,8 +11,12 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func listDataset(app *application.Application) httprouter.Handle {
+func deleteDataset(app *application.Application) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		defer r.Body.Close()
+
+		// Extract dataset ID from URL parameters
+		datasetID := p.ByName("id")
 
 		// Authenticate user (optional, depending on your requirements)
 		// _, err := authutility.ExtractTokenMetadata(r)
@@ -24,39 +26,28 @@ func listDataset(app *application.Application) httprouter.Handle {
 		// 	return
 		// }
 
-		defer r.Body.Close()
-
+		// Initialize dataset model
 		dataset := &models.Dataset{}
 
-		datasets, err := dataset.ListDataset(app)
-
-		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				w.WriteHeader(http.StatusPreconditionFailed)
-				logger.Info.Println("No records found")
-				return
-			}
-
+		// Delete the dataset
+		if err := dataset.Delete(app, datasetID); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			newResponse := apiresponse.New("failed", "Error in fetching datasets")
-			dataResponse := newResponse.AddData(map[string]string{
-				"Error": err.Error(),
-			})
-			response, _ := dataResponse.Marshal()
+			newResponse := apiresponse.New("failed", "Error deleting dataset")
+			badResponse := newResponse.AddReason(err.Error())
+			response, _ := badResponse.Marshal()
 			w.Write(response)
-			logger.Error.Printf("Error in fetching Datasets %v\n", err)
+			logger.Error.Printf("Error deleting dataset: %v\n", err)
 			return
 		}
 
+		// Respond with success message
 		w.Header().Set("Content-Type", "application/json")
-		newResponse := apiresponse.New("success", "List of all datasets")
-
-		dataResponse := newResponse.AddData(datasets)
-		response, _ := dataResponse.Marshal()
+		newResponse := apiresponse.New("success", "Dataset deleted successfully")
+		response, _ := newResponse.Marshal()
 		w.Write(response)
 	}
 }
 
 func Do(app *application.Application) httprouter.Handle {
-	return middleware.Chain(listDataset(app), middleware.LogRequest)
+	return middleware.Chain(deleteDataset(app), middleware.LogRequest)
 }

@@ -18,6 +18,14 @@ func getDataset(app *application.Application) httprouter.Handle {
 
 		unique_id := p.ByName("id")
 
+		// Authenticate user (optional, depending on your requirements)
+		// _, err := authutility.ExtractTokenMetadata(r)
+		// if err != nil {
+		// 	logger.Error.Printf("Error in deleting dataset, Unauthorized %v\n", err)
+		// 	w.WriteHeader(http.StatusUnauthorized)
+		// 	return
+		// }
+
 		defer r.Body.Close()
 
 		dataset := &models.Dataset{}

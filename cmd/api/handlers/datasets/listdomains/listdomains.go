@@ -15,6 +15,14 @@ import (
 
 func listDomains(app *application.Application) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		// Authenticate user (optional, depending on your requirements)
+		// _, err := authutility.ExtractTokenMetadata(r)
+		// if err != nil {
+		// 	logger.Error.Printf("Error in deleting dataset, Unauthorized %v\n", err)
+		// 	w.WriteHeader(http.StatusUnauthorized)
+		// 	return
+		// }
+
 		defer r.Body.Close()
 
 		domain := &models.Tag{}

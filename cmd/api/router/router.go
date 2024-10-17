@@ -1,11 +1,13 @@
 package router
 
 import (
+	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/deletedataset"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/getdataset"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/listdataset"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/listdomains"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/listtags"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/onboarddataset"
+	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/updatedataset"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/notebook/buildnotebook"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/notebook/deletenotebook"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/notebook/listnotebook"
@@ -35,6 +37,8 @@ func Get(app *application.Application) *httprouter.Router {
 	mux.GET("/api/datasets", listdataset.Do(app))
 	mux.POST("/api/dataset", onboarddataset.Do(app))
 	mux.GET("/api/dataset/:id", getdataset.Do(app))
+	mux.DELETE("/api/dataset/:id", deletedataset.Do(app))
+	mux.PUT("/api/dataset/:id", updatedataset.Do(app))
 
 	mux.GET("/api/resources/:id", listresource.Do(app))
 	mux.POST("/api/resource", onboardresource.Do(app))

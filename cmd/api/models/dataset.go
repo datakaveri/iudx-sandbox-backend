@@ -2,6 +2,8 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
 
 	"github.com/iudx-sandbox-backend/pkg/application"
 	"github.com/iudx-sandbox-backend/pkg/logger"
@@ -168,4 +170,49 @@ func (g *Dataset) GetDataset(app *application.Application, unique_id string) (Da
 	}
 
 	return dataset, nil
+}
+
+func (d *Dataset) Delete(app *application.Application, datasetID string) error {
+	query := `DELETE FROM dataset WHERE unique_id = $1`
+	_, err := app.DB.Client.Exec(query, datasetID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UpdateDataset(app *application.Application, datasetID string, updateData map[string]interface{}) error {
+	// Build the dynamic SQL query
+	var updates []string
+	var values []interface{}
+	i := 1
+
+	for key, value := range updateData {
+		updates = append(updates, fmt.Sprintf("%s = $%d", key, i))
+		values = append(values, value)
+		i++
+	}
+
+	if len(updates) == 0 {
+		return fmt.Errorf("no fields to update")
+	}
+
+	query := fmt.Sprintf("UPDATE dataset SET %s WHERE unique_id = $%d",
+		strings.Join(updates, ", "), i)
+
+	values = append(values, datasetID)
+
+	logger.Info.Println(query)
+	logger.Info.Println(values)
+
+	// Execute the query
+	_, err := app.DB.Client.Exec(query, values...)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
