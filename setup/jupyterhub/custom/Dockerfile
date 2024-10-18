@@ -203,7 +203,7 @@ RUN --mount=type=cache,id=ubuntu-small-gdal,target=$HOME/.cache \
     && for i in /build_gdal_version_changing/usr/bin/*; do ${GCC_ARCH}-linux-gnu-strip -s $i 2>/dev/null || /bin/true; done
 
 # Build final image
-FROM quay.io/jupyter/base-notebook:latest AS runner
+FROM quay.io/jupyter/datascience-notebook:latest AS runner
 
 USER root
 RUN date
@@ -230,6 +230,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         # pil for antialias option of gdal2tiles
         python3-pil \
     && apt-get install -y python-is-python3 \
+    && pip3 install scipy seaborn pysheds geopandas rasterio folium rioxarray leafmap whitebox graphh dash dash-leaflet \
     && conda install gdal
 
 # Order layers starting with less frequently varying ones
