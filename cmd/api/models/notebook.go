@@ -36,7 +36,7 @@ type NotebookResponse struct {
 	UserId       int
 	ServerId     sql.NullInt64
 	SpawnerId    sql.NullInt64
-	SpawnerName  string
+	SpawnerName  sql.NullString
 	NotebookId   string
 	NotebookName string
 	NotebookUrl  string
@@ -45,7 +45,7 @@ type NotebookResponse struct {
 	Status       string
 	BuildId      string
 	CreatedAt    string
-	LastUsed     string
+	LastUsed     sql.NullString
 }
 
 func (g *Notebook) Create(app *application.Application) error {
@@ -268,15 +268,18 @@ func (g *Notebook) GetSpawnerName(app *application.Application, userId int, note
 		WHERE notebook."userId" = $1 AND notebook."notebookId" =$2;
 	`
 
-	notebook := NotebookResponse{}
+	var spawnerName sql.NullString
 	result := app.DB.Client.QueryRow(stmt, userId, notebookId)
 
-	err := result.Scan(&notebook.RepoName)
+	err := result.Scan(&spawnerName)
 	if err != nil {
 		return "", err
 	}
 
-	return notebook.RepoName, nil
+	if spawnerName.Valid {
+		return spawnerName.String, nil
+	}
+	return "", nil
 }
 
 func (g *Notebook) RemoveSpawnerId(app *application.Application) error {
