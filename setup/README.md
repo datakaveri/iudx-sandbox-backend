@@ -159,7 +159,7 @@ openssl rand -hex 32
 
 ### Create namespace
 
-Create `binder` namespace using kubectl
+Create `iudx-sandbox` namespace using kubectl
 
 ```shell
 kubectl create ns binder
@@ -172,8 +172,8 @@ Create database for binderhub which will be shared by sandbox backend as well
 Update db name, username and password
 
 ```shell
-kubectl -n binder apply -f postgres-config.yaml
-kubectl -n binder apply -f database.yaml
+kubectl -n iudx-sandbox apply -f postgres-config.yaml
+kubectl -n iudx-sandbox apply -f database.yaml
 ```
 
 ### Container Registry
@@ -209,22 +209,22 @@ We need 4 different config maps for running binder with persistent storage enabl
 
 Creating config map for persistent storage
 ```shell
-kubectl -n binder create -f persistent_config_configmap.yaml
+kubectl -n iudx-sandbox create -f persistent_config_configmap.yaml
 ```
 
 Creating config map for scheduler config for token refresh
 ```shell
-kubectl -n binder create -f scheduler_configmap.yaml
+kubectl -n iudx-sandbox create -f scheduler_configmap.yaml
 ```
 
 Creating supervisord config map for running the above scheduler in background
 ```shell
-kubectl -n binder create -f supervisord_configmap.yaml
+kubectl -n iudx-sandbox create -f supervisord_configmap.yaml
 ```
 
 Creating jupyter config map for voila configuration (Currently this config is not being used)
 ```shell
-kubectl -n binder create -f jupyter_config_configmap.yaml
+kubectl -n iudx-sandbox create -f jupyter_config_configmap.yaml
 ```
 
 ### Config File
@@ -325,12 +325,12 @@ Commands to start the server
 ```shell
 helm repo add jupyterhub https://jupyterhub.github.io/helm-chart
 helm repo update
-helm install binder jupyterhub/binderhub --version=0.2.0-n845.hcc57b24 --namespace=binder -f secret.yaml -f config-dev.yaml
+helm install binder jupyterhub/binderhub --version=1.0.0-0.dev.git.3749.hf89ac98c --namespace=iudx-sandbox -f secret.yaml -f config-dev.yaml
 ```
 
 For prod
 ```shell
-helm install binder jupyterhub/binderhub --version=0.2.0-n845.hcc57b24 --namespace=binder -f secret.yaml -f config-prod.yaml
+helm install binder jupyterhub/binderhub --version=1.0.0-0.dev.git.3749.hf89ac98c --namespace=iudx-sandbox -f secret.yaml -f config-prod.yaml
 ```
 
 Replace the latest version from [here](https://jupyterhub.github.io/helm-chart/#development-releases-binderhub)
@@ -340,12 +340,12 @@ Both the commands below are for local dev setup
 
 If you have not provided hub_url above run below command to get the address. (Skip this if its SSL based config)
 ```shell
-kubectl --namespace=binder get svc proxy-public
+kubectl --namespace=iudx-sandbox get svc proxy-public
 ```
 
 Upgrade helm chart after updating config
 ```shell
-helm upgrade binder jupyterhub/binderhub --version=0.2.0-n845.hcc57b24 --namespace=binder -f secret.yaml -f config-dev.yaml
+helm upgrade binder jupyterhub/binderhub --version=1.0.0-0.dev.git.3749.hf89ac98c --namespace=iudx-sandbox -f secret.yaml -f config-dev.yaml
 ```
 
 You are good to go now. 

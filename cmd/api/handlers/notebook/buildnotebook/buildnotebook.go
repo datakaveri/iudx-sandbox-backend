@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"net/url"
 
 	"github.com/google/uuid"
 	"github.com/iudx-sandbox-backend/cmd/api/models"
@@ -15,85 +14,71 @@ import (
 	"github.com/iudx-sandbox-backend/pkg/logger"
 	"github.com/iudx-sandbox-backend/pkg/middleware"
 	"github.com/julienschmidt/httprouter"
-	"github.com/r3labs/sse/v2"
 )
 
-func handleBinderSSE(app *application.Application, msg *sse.Event, buildId string, userId int) {
-	notebook := &models.Notebook{}
-	json.Unmarshal(msg.Data, notebook)
-	notebook.BuildId = buildId
-
-	if notebook.Phase == "ready" {
-		// FIXME slightly inconsistent approach its unreliable maybe we can change spawner name but for single server that won't work
-		parsedUrl, err := url.Parse(notebook.NotebookUrl)
-		baseUrl := parsedUrl.Path + "/"
-		if err != nil {
-			logger.Error.Printf("Error parsing url %v\n", err)
-		}
-		spawner := &models.Spawner{}
-		res, err := spawner.GetSpawnerIdBasedOnBaseUrl(app, baseUrl, userId)
-		if err != nil {
-			logger.Error.Printf("Error finding spawner id %v\n", err)
-		}
-		notebook.SpawnerId = res.Id
-		if err := notebook.UpdateNotebookSpawnerId(app); err != nil {
-			logger.Error.Printf("Error failed to update spawner id %v\n", err)
-		}
-	}
-
-	if err := notebook.UpdateNotebookBuildStatus(app); err != nil {
-		logger.Error.Printf("Binder: Error in building notebook %v\n", err)
-		return
-	}
-}
-
-func makeSseRequest(app *application.Application, buildUrl, cookie, buildId string, userId int) {
-	sseClient := sse.NewClient(buildUrl, CustomHeader(cookie))
-
-	sseserror := sseClient.SubscribeRaw(func(msg *sse.Event) {
-		go handleBinderSSE(app, msg, buildId, userId)
-	})
-
-	if sseserror != nil {
-		logger.Error.Printf("Error in sse %v\n", sseserror)
-	}
-}
-
-func CustomHeader(cookie string) func(c *sse.Client) {
-	return func(c *sse.Client) {
-		c.Headers = map[string]string{
-			"cookie": cookie,
-		}
-	}
-}
-
-func buildNotebook(app *application.Application, spawnerSyncTask *spawnernotebooksync.SpawnerNotebookSyncTask) httprouter.Handle {
+func buildNotebook(app *application.Application) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		// Create context with request ID for tracing
+		ctx := context.WithValue(r.Context(), "request_id", uuid.New().String())
+
+		logger.InfoWithContext(ctx, "Starting notebook build request")
 
 		defer r.Body.Close()
+
+		// Extract and validate authentication
 		tokenUser, err := authutility.ExtractTokenMetadata(r)
 		if err != nil {
-			logger.Error.Printf("Error in building notebook, Unauthorized %v\n", err)
+			logger.ErrorWithMetadata("Authentication failed during notebook build", map[string]interface{}{
+				"remote_addr": r.RemoteAddr,
+				"user_agent":  r.UserAgent(),
+			}, err)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
+
+		// Add user ID to context for logging
+		ctx = context.WithValue(ctx, "user_id", tokenUser.UserName)
+
+		logger.DebugWithContext(ctx, "Authentication successful for notebook build")
+
+		// Get user details
 		userModel := &models.User{}
 		user, err := userModel.Get(app, tokenUser.UserName)
-
 		if err != nil {
-			logger.Error.Printf("Error in building notebook, User not found %v\n", err)
+			logger.ErrorWithMetadata("User lookup failed during notebook build", map[string]interface{}{
+				"username": tokenUser.UserName,
+			}, err)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
+		logger.DebugWithMetadata("User details retrieved", map[string]interface{}{
+			"user_id":  user.UserId,
+			"username": user.Name,
+		})
+
+		// Parse notebook request
 		notebook := &models.Notebook{}
-		json.NewDecoder(r.Body).Decode(notebook)
+		if err := json.NewDecoder(r.Body).Decode(notebook); err != nil {
+			logger.WarnWithError("Invalid JSON in notebook build request", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 
-		// check if the notebook server is already present
-		notebookId, err := notebook.GetNotebookIdByRepoName(app, notebook.RepoName, user.UserId)
+		logger.InfoWithMetadata("Notebook build requested", map[string]interface{}{
+			"repo_name": notebook.RepoName,
+			"user_id":   user.UserId,
+		})
 
-		if notebookId != "" {
-			logger.Error.Printf("Error in building notebook, Notebook already exists %v\n", err)
+		// Check for existing notebook
+		existingNotebookId, err := notebook.GetNotebookIdByRepoName(app, notebook.RepoName, user.UserId)
+		if existingNotebookId != "" {
+			logger.WarnWithMetadata("Notebook already exists", map[string]interface{}{
+				"repo_name":            notebook.RepoName,
+				"existing_notebook_id": existingNotebookId,
+				"user_id":              user.UserId,
+			})
+
 			w.Header().Set("Content-Type", "application/json")
 			newResponse := apiresponse.New("error", "Notebook already exists. Please restart or use the same")
 			response, _ := newResponse.Marshal()
@@ -102,28 +87,60 @@ func buildNotebook(app *application.Application, spawnerSyncTask *spawnernoteboo
 			return
 		}
 
+		// Generate IDs and set notebook properties
 		notebook.NotebookId = uuid.New().String()
 		notebook.BuildId = uuid.New().String()
 		notebook.UserId = user.UserId
 		notebook.Phase = "building"
 
-		// token := r.Header.Get("Authorization")
-		// splitToken := strings.Split(token, "Bearer ")
-		// token = splitToken[1]
-
 		cookie := r.Header.Get("BuildToken")
-
 		buildUrl := app.Cfg.GetBinderNotebookBuildApi(notebook.RepoName)
 
+		logger.DebugWithMetadata("Notebook configuration prepared", map[string]interface{}{
+			"notebook_id": notebook.NotebookId,
+			"build_id":    notebook.BuildId,
+			"build_url":   buildUrl,
+			"has_cookie":  cookie != "",
+		})
+
+		// Create notebook record
 		if err := notebook.Create(app); err != nil {
-			logger.Error.Printf("Error in building notebook %v\n", err)
+			logger.ErrorWithMetadata("Failed to create notebook record", map[string]interface{}{
+				"notebook_id": notebook.NotebookId,
+				"build_id":    notebook.BuildId,
+				"repo_name":   notebook.RepoName,
+			}, err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		ctx := context.Background()
-		// go makeSseRequest(app, buildUrl, cookie, notebook.BuildId, notebook.UserId)
-		app.TaskQueue.Queue.Add(spawnerSyncTask.Task.WithArgs(ctx, app, buildUrl, cookie, notebook.BuildId, notebook.UserId))
+		logger.InfoWithMetadata("Notebook record created successfully", map[string]interface{}{
+			"notebook_id": notebook.NotebookId,
+			"build_id":    notebook.BuildId,
+		})
+
+		// Add spawner notebook sync task to the queue
+		if err := spawnernotebooksync.AddSpawnerSyncTask(ctx, app, buildUrl, cookie, notebook.BuildId, notebook.UserId); err != nil {
+			logger.ErrorWithMetadata("Failed to add spawner sync task to queue", map[string]interface{}{
+				"build_id":  notebook.BuildId,
+				"user_id":   notebook.UserId,
+				"build_url": buildUrl,
+			}, err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		logger.InfoWithMetadata("Spawner sync task added to queue successfully", map[string]interface{}{
+			"build_id":  notebook.BuildId,
+			"task_type": "spawner-notebook-sync",
+		})
+
+		// Audit log for notebook creation
+		logger.AuditLog(ctx, "notebook_build_started", "notebook", map[string]interface{}{
+			"notebook_id": notebook.NotebookId,
+			"build_id":    notebook.BuildId,
+			"repo_name":   notebook.RepoName,
+		})
 
 		w.Header().Set("Content-Type", "application/json")
 		newResponse := apiresponse.New("success", "Notebook Building. Please check the status")
@@ -132,10 +149,11 @@ func buildNotebook(app *application.Application, spawnerSyncTask *spawnernoteboo
 		})
 		response, _ := dataResponse.Marshal()
 		w.Write(response)
+
+		logger.InfoWithContext(ctx, "Notebook build request completed successfully")
 	}
 }
 
 func Do(app *application.Application) httprouter.Handle {
-	spawnerNotebookSync := spawnernotebooksync.RegisterTask()
-	return middleware.Chain(buildNotebook(app, spawnerNotebookSync), middleware.LogRequest, middleware.AuthorizeRequest)
+	return middleware.Chain(buildNotebook(app), middleware.LogRequest, middleware.AuthorizeRequest)
 }

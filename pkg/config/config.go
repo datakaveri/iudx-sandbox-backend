@@ -18,6 +18,7 @@ type Config struct {
 	jupyterHubApi             string
 	jupyterHubApiToken        string
 	keycloakPublicCertificate string
+	staticAPIKey              string
 }
 
 func Get() *Config {
@@ -34,6 +35,7 @@ func Get() *Config {
 	flag.StringVar(&conf.jupyterHubApi, "jupyterHubApi", os.Getenv("JUPYTERHUB_API"), "Jupyterhub API Host")
 	flag.StringVar(&conf.jupyterHubApiToken, "jupyterHubApiToken", os.Getenv("JUPYTERHUB_API_TOKEN"), "Jupyterhub API Token")
 	flag.StringVar(&conf.keycloakPublicCertificate, "keycloakPublicCertificate", os.Getenv("KEYCLOAK_PUBLIC_KEY"), "Keycloak Certificate Value excluding ")
+	flag.StringVar(&conf.staticAPIKey, "staticAPIKey", os.Getenv("STATIC_API_KEY"), "Static API Key for service-to-service authentication")
 
 	flag.Parse()
 
@@ -84,4 +86,30 @@ func (c *Config) GetKeycloakPublicCertificate() string {
 	return "-----BEGIN CERTIFICATE-----\n" +
 		c.keycloakPublicCertificate +
 		"\n-----END CERTIFICATE-----"
+}
+
+func (c *Config) GetStaticAPIKey() string {
+	return c.staticAPIKey
+}
+
+// ValidateConfig validates required configuration values
+func (c *Config) ValidateConfig() error {
+	required := map[string]string{
+		"POSTGRES_USER":       c.dbUser,
+		"POSTGRES_PASSWORD":   c.dbPass,
+		"POSTGRES_HOST":       c.dbHost,
+		"POSTGRES_PORT":       c.dbPort,
+		"POSTGRES_DB":         c.dbName,
+		"API_PORT":            c.apiPort,
+		"KEYCLOAK_PUBLIC_KEY": c.keycloakPublicCertificate,
+		"STATIC_API_KEY":      c.staticAPIKey,
+	}
+
+	for envVar, value := range required {
+		if value == "" {
+			return fmt.Errorf("required environment variable %s is not set", envVar)
+		}
+	}
+
+	return nil
 }

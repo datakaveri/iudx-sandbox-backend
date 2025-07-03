@@ -2,6 +2,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: supervisord-config
+  namespace: iudx-sandbox
 data:
   supervisord.conf: |-
     [supervisord]

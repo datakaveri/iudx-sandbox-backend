@@ -20,6 +20,7 @@ func Get() (*Application, error) {
 		return nil, err
 	}
 
+	// Initialize in-memory task queue
 	tq := taskqueue.InitializeTaskQueue()
 
 	return &Application{

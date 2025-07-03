@@ -2,6 +2,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: persistent-bhub-config
+  namespace: iudx-sandbox
 data:
   persistent_bhub_config.py: |-
     import json

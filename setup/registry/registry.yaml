@@ -1,8 +1,8 @@
-namespace: binder
+namespace: registry
 
 persistence:
   enabled: true
-  storageClass: ebs-storage-class
+  storageClass: ebs-csi-storage-class
 
 autoscaling:
   enabled: true
@@ -20,13 +20,13 @@ s3:
 ingress:
   enabled: true
   hosts:
-    - sandbox-registry.iudx.org.in
+    - private-registry.iudx.org.in
   annotations:
     kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
   tls:
-    - secretName: sandbox-registry-iudx-org-in-tls
+    - secretName: private-registry-iudx-org-in-tls
       hosts:
-        - sandbox-registry.iudx.org.in
+        - private-registry.iudx.org.in
 

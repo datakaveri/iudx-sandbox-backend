@@ -1,13 +1,14 @@
 package listdataset
 
 import (
-	"database/sql"
-	"errors"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/iudx-sandbox-backend/cmd/api/models"
 	"github.com/iudx-sandbox-backend/pkg/apiresponse"
 	"github.com/iudx-sandbox-backend/pkg/application"
+	"github.com/iudx-sandbox-backend/pkg/authutility"
 	"github.com/iudx-sandbox-backend/pkg/logger"
 	"github.com/iudx-sandbox-backend/pkg/middleware"
 	"github.com/julienschmidt/httprouter"
@@ -15,39 +16,188 @@ import (
 
 func listDataset(app *application.Application) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		defer r.Body.Close()
+		ctx := r.Context()
+		start := time.Now()
 
-		dataset := &models.Dataset{}
+		logger.InfoWithContext(ctx, "Starting dataset list request")
 
-		datasets, err := dataset.ListDataset(app)
-
+		// Extract user information for authorization and logging
+		tokenUser, err := authutility.ExtractTokenMetadata(r)
 		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				w.WriteHeader(http.StatusPreconditionFailed)
-				logger.Info.Println("No records found")
-				return
-			}
-
-			w.WriteHeader(http.StatusInternalServerError)
-			newResponse := apiresponse.New("failed", "Error in fetching datasets")
-			dataResponse := newResponse.AddData(map[string]string{
-				"Error": err.Error(),
-			})
-			response, _ := dataResponse.Marshal()
-			w.Write(response)
-			logger.Error.Printf("Error in fetching Datasets %v\n", err)
+			logger.ErrorWithMetadata("Failed to extract user metadata for dataset listing", map[string]interface{}{
+				"remote_addr": r.RemoteAddr,
+				"error":       err.Error(),
+			}, err)
+			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		newResponse := apiresponse.New("success", "List of all datasets")
+		logger.DebugWithMetadata("User authenticated for dataset listing", map[string]interface{}{
+			"username": tokenUser.UserName,
+			"user_id":  tokenUser.UserID,
+			"roles":    tokenUser.Roles,
+		})
 
-		dataResponse := newResponse.AddData(datasets)
-		response, _ := dataResponse.Marshal()
+		// Parse query parameters
+		query := r.URL.Query()
+
+		// Parse page parameter
+		pageStr := query.Get("page")
+		page := 1
+		if pageStr != "" {
+			if parsedPage, err := strconv.Atoi(pageStr); err != nil {
+				logger.WarnWithMetadata("Invalid page parameter provided", map[string]interface{}{
+					"username":     tokenUser.UserName,
+					"page_param":   pageStr,
+					"default_used": 1,
+				})
+			} else if parsedPage > 0 {
+				page = parsedPage
+			}
+		}
+
+		// Parse limit parameter
+		limitStr := query.Get("limit")
+		limit := 10 // default limit
+		if limitStr != "" {
+			if parsedLimit, err := strconv.Atoi(limitStr); err != nil {
+				logger.WarnWithMetadata("Invalid limit parameter provided", map[string]interface{}{
+					"username":     tokenUser.UserName,
+					"limit_param":  limitStr,
+					"default_used": 10,
+				})
+			} else if parsedLimit > 0 && parsedLimit <= 100 {
+				limit = parsedLimit
+			} else if parsedLimit > 100 {
+				logger.WarnWithMetadata("Limit parameter exceeds maximum", map[string]interface{}{
+					"username":        tokenUser.UserName,
+					"requested_limit": parsedLimit,
+					"max_limit":       100,
+					"applied_limit":   100,
+				})
+				limit = 100
+			}
+		}
+
+		// Parse search/filter parameters
+		searchTerm := query.Get("search")
+		domain := query.Get("domain")
+		tag := query.Get("tag")
+
+		logger.InfoWithMetadata("Dataset listing parameters parsed", map[string]interface{}{
+			"username":    tokenUser.UserName,
+			"page":        page,
+			"limit":       limit,
+			"search_term": searchTerm,
+			"domain":      domain,
+			"tag":         tag,
+		})
+
+		// Create dataset model and perform query
+		datasetModel := &models.Dataset{}
+
+		logger.DebugWithMetadata("Executing dataset query", map[string]interface{}{
+			"username": tokenUser.UserName,
+			"query_params": map[string]interface{}{
+				"page":   page,
+				"limit":  limit,
+				"search": searchTerm,
+				"domain": domain,
+				"tag":    tag,
+			},
+		})
+
+		datasets, err := datasetModel.GetAll(app, page, limit, searchTerm, domain, tag)
+		queryDuration := time.Since(start)
+
+		if err != nil {
+			logger.ErrorWithMetadata("Database query failed for dataset listing", map[string]interface{}{
+				"username":       tokenUser.UserName,
+				"page":           page,
+				"limit":          limit,
+				"search_term":    searchTerm,
+				"domain":         domain,
+				"tag":            tag,
+				"query_duration": queryDuration.String(),
+			}, err)
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// Log performance metrics
+		if queryDuration > 5*time.Second {
+			logger.WarnWithMetadata("Slow dataset query detected", map[string]interface{}{
+				"username":       tokenUser.UserName,
+				"query_duration": queryDuration.String(),
+				"result_count":   len(datasets),
+				"page":           page,
+				"limit":          limit,
+			})
+		} else if queryDuration > 1*time.Second {
+			logger.InfoWithMetadata("Dataset query completed", map[string]interface{}{
+				"username":       tokenUser.UserName,
+				"query_duration": queryDuration.String(),
+				"result_count":   len(datasets),
+			})
+		} else {
+			logger.DebugWithMetadata("Dataset query completed efficiently", map[string]interface{}{
+				"username":       tokenUser.UserName,
+				"query_duration": queryDuration.String(),
+				"result_count":   len(datasets),
+			})
+		}
+
+		// Audit log for data access
+		logger.AuditLog(ctx, "dataset_list_accessed", "datasets", map[string]interface{}{
+			"username":     tokenUser.UserName,
+			"result_count": len(datasets),
+			"page":         page,
+			"limit":        limit,
+			"filters": map[string]string{
+				"search": searchTerm,
+				"domain": domain,
+				"tag":    tag,
+			},
+		})
+
+		// Prepare response
+		w.Header().Set("Content-Type", "application/json")
+
+		newResponse := apiresponse.New("success", "Datasets retrieved successfully")
+		dataResponse := newResponse.AddData(map[string]interface{}{
+			"datasets": datasets,
+			"pagination": map[string]interface{}{
+				"page":         page,
+				"limit":        limit,
+				"result_count": len(datasets),
+			},
+		})
+
+		response, err := dataResponse.Marshal()
+		if err != nil {
+			logger.ErrorWithMetadata("Failed to marshal dataset response", map[string]interface{}{
+				"username":     tokenUser.UserName,
+				"result_count": len(datasets),
+			}, err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		totalDuration := time.Since(start)
+
+		logger.InfoWithMetadata("Dataset list request completed successfully", map[string]interface{}{
+			"username":       tokenUser.UserName,
+			"total_duration": totalDuration.String(),
+			"result_count":   len(datasets),
+			"response_size":  len(response),
+		})
+
+		w.WriteHeader(http.StatusOK)
 		w.Write(response)
 	}
 }
 
 func Do(app *application.Application) httprouter.Handle {
-	return middleware.Chain(listDataset(app), middleware.LogRequest)
+	return middleware.Chain(listDataset(app), middleware.LogRequest, middleware.AuthorizeRequest)
 }
