@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/iudx-sandbox-backend/cmd/api/models"
@@ -129,7 +130,16 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 		notebook.Message = eventData.Message
 		notebook.ImageName = eventData.Image
 		notebook.Token = sql.NullString{String: eventData.Token, Valid: eventData.Token != ""}
-		notebook.NotebookUrl = sql.NullString{String: eventData.Url, Valid: eventData.Url != ""}
+
+		// Append /lab to the URL, ensuring no double slashes
+		notebookUrl := eventData.Url
+		if notebookUrl != "" {
+			// Remove trailing slash if present
+			notebookUrl = strings.TrimSuffix(notebookUrl, "/")
+			// Append /lab
+			notebookUrl = notebookUrl + "/lab"
+		}
+		notebook.NotebookUrl = sql.NullString{String: notebookUrl, Valid: notebookUrl != ""}
 
 		logger.InfoWithMetadata("Notebook status update received", map[string]interface{}{
 			"build_id":     buildId,
