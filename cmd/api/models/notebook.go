@@ -18,7 +18,7 @@ type Notebook struct {
 	BuildId      string         `json:"buildId"`
 	Phase        string         `json:"phase"`
 	Message      string         `json:"message"`
-	Token        string         `json:"token"`
+	Token        sql.NullString `json:"token"`
 	ImageName    string         `json:"imageName"`
 	CreatedAt    string         `json:"createdAt"`
 	LastUsed     string         `json:"lastUsed"`
@@ -41,7 +41,7 @@ type NotebookResponse struct {
 	NotebookName string
 	NotebookUrl  sql.NullString
 	RepoName     string
-	Token        string
+	Token        sql.NullString
 	Status       string
 	BuildId      string
 	CreatedAt    string
