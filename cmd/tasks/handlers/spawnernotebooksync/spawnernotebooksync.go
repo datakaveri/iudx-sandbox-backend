@@ -77,7 +77,7 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 		logger.InfoWithMetadata("Notebook status update received", map[string]interface{}{
 			"build_id":     buildId,
 			"phase":        notebook.Phase,
-			"notebook_url": notebook.NotebookUrl,
+			"notebook_url": notebook.NotebookUrl.String,
 			"event_count":  eventCount,
 			"ready":        notebook.Phase == "ready",
 		})
@@ -85,15 +85,15 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 		if notebook.Phase == "ready" {
 			logger.InfoWithMetadata("Notebook build completed - processing spawner ID", map[string]interface{}{
 				"build_id":     buildId,
-				"notebook_url": notebook.NotebookUrl,
+				"notebook_url": notebook.NotebookUrl.String,
 			})
 
 			// FIXME slightly inconsistent approach its unreliable maybe we can change spawner name but for single server that won't work
-			parsedUrl, err := url.Parse(notebook.NotebookUrl)
+			parsedUrl, err := url.Parse(notebook.NotebookUrl.String)
 			if err != nil {
 				logger.ErrorWithMetadata("Failed to parse notebook URL for spawner ID extraction", map[string]interface{}{
 					"build_id":     buildId,
-					"notebook_url": notebook.NotebookUrl,
+					"notebook_url": notebook.NotebookUrl.String,
 				}, err)
 				return
 			}

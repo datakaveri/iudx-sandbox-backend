@@ -11,17 +11,17 @@ import (
 type Notebook struct {
 	UserId       int
 	SpawnerId    int
-	NotebookId   string `json:"notebookId"`
-	NotebookName string `json:"name"`
-	NotebookUrl  string `json:"url"`
-	RepoName     string `json:"repoName"`
-	BuildId      string `json:"buildId"`
-	Phase        string `json:"phase"`
-	Message      string `json:"message"`
-	Token        string `json:"token"`
-	ImageName    string `json:"imageName"`
-	CreatedAt    string `json:"createdAt"`
-	LastUsed     string `json:"lastUsed"`
+	NotebookId   string         `json:"notebookId"`
+	NotebookName string         `json:"name"`
+	NotebookUrl  sql.NullString `json:"url"`
+	RepoName     string         `json:"repoName"`
+	BuildId      string         `json:"buildId"`
+	Phase        string         `json:"phase"`
+	Message      string         `json:"message"`
+	Token        string         `json:"token"`
+	ImageName    string         `json:"imageName"`
+	CreatedAt    string         `json:"createdAt"`
+	LastUsed     string         `json:"lastUsed"`
 }
 
 type BuildStatusResponse struct {
@@ -39,7 +39,7 @@ type NotebookResponse struct {
 	SpawnerName  sql.NullString
 	NotebookId   string
 	NotebookName string
-	NotebookUrl  string
+	NotebookUrl  sql.NullString
 	RepoName     string
 	Token        string
 	Status       string
