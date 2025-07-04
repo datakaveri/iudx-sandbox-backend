@@ -1,6 +1,8 @@
 package listdataset
 
 import (
+	"database/sql"
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -15,12 +17,13 @@ import (
 
 func listDataset(app *application.Application) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		defer r.Body.Close()
 		ctx := r.Context()
 		start := time.Now()
 
 		logger.InfoWithContext(ctx, "Starting dataset list request")
 
-		// Parse query parameters
+		// Parse query parameters for enhanced functionality (optional)
 		query := r.URL.Query()
 
 		// Parse page parameter
@@ -31,6 +34,7 @@ func listDataset(app *application.Application) httprouter.Handle {
 				logger.WarnWithMetadata("Invalid page parameter provided", map[string]interface{}{
 					"page_param":   pageStr,
 					"default_used": 1,
+					"remote_addr":  r.RemoteAddr,
 				})
 			} else if parsedPage > 0 {
 				page = parsedPage
@@ -45,6 +49,7 @@ func listDataset(app *application.Application) httprouter.Handle {
 				logger.WarnWithMetadata("Invalid limit parameter provided", map[string]interface{}{
 					"limit_param":  limitStr,
 					"default_used": 10,
+					"remote_addr":  r.RemoteAddr,
 				})
 			} else if parsedLimit > 0 && parsedLimit <= 100 {
 				limit = parsedLimit
@@ -53,6 +58,7 @@ func listDataset(app *application.Application) httprouter.Handle {
 					"requested_limit": parsedLimit,
 					"max_limit":       100,
 					"applied_limit":   100,
+					"remote_addr":     r.RemoteAddr,
 				})
 				limit = 100
 			}
@@ -72,35 +78,51 @@ func listDataset(app *application.Application) httprouter.Handle {
 			"remote_addr": r.RemoteAddr,
 		})
 
-		// Create dataset model and perform query
-		datasetModel := &models.Dataset{}
+		dataset := &models.Dataset{}
 
-		logger.DebugWithMetadata("Executing dataset query", map[string]interface{}{
-			"query_params": map[string]interface{}{
-				"page":   page,
-				"limit":  limit,
-				"search": searchTerm,
-				"domain": domain,
-				"tag":    tag,
-			},
-			"remote_addr": r.RemoteAddr,
-		})
+		// Use enhanced method if available, otherwise fallback to original
+		var datasets interface{}
+		var err error
 
-		datasets, err := datasetModel.GetAll(app, page, limit, searchTerm, domain, tag)
+		// Try enhanced method first (if it exists with GetAll)
+		if searchTerm != "" || domain != "" || tag != "" || page > 1 || limit != 10 {
+			logger.DebugWithMetadata("Using enhanced dataset query", map[string]interface{}{
+				"remote_addr": r.RemoteAddr,
+			})
+			datasets, err = dataset.GetAll(app, page, limit, searchTerm, domain, tag)
+		} else {
+			// Use original method for backward compatibility
+			logger.DebugWithMetadata("Using original dataset query", map[string]interface{}{
+				"remote_addr": r.RemoteAddr,
+			})
+			datasets, err = dataset.ListDataset(app)
+		}
+
 		queryDuration := time.Since(start)
 
 		if err != nil {
-			logger.ErrorWithMetadata("Database query failed for dataset listing", map[string]interface{}{
-				"page":           page,
-				"limit":          limit,
-				"search_term":    searchTerm,
-				"domain":         domain,
-				"tag":            tag,
-				"query_duration": queryDuration.String(),
+			if errors.Is(err, sql.ErrNoRows) {
+				logger.InfoWithMetadata("No datasets found", map[string]interface{}{
+					"remote_addr":    r.RemoteAddr,
+					"query_duration": queryDuration.String(),
+				})
+				w.WriteHeader(http.StatusPreconditionFailed)
+				return
+			}
+
+			logger.ErrorWithMetadata("Error in fetching datasets", map[string]interface{}{
 				"remote_addr":    r.RemoteAddr,
+				"error":          err.Error(),
+				"query_duration": queryDuration.String(),
 			}, err)
 
 			w.WriteHeader(http.StatusInternalServerError)
+			newResponse := apiresponse.New("failed", "Error in fetching datasets")
+			dataResponse := newResponse.AddData(map[string]string{
+				"Error": err.Error(),
+			})
+			response, _ := dataResponse.Marshal()
+			w.Write(response)
 			return
 		}
 
@@ -108,30 +130,24 @@ func listDataset(app *application.Application) httprouter.Handle {
 		if queryDuration > 5*time.Second {
 			logger.WarnWithMetadata("Slow dataset query detected", map[string]interface{}{
 				"query_duration": queryDuration.String(),
-				"result_count":   len(datasets),
-				"page":           page,
-				"limit":          limit,
 				"remote_addr":    r.RemoteAddr,
 			})
 		} else if queryDuration > 1*time.Second {
 			logger.InfoWithMetadata("Dataset query completed", map[string]interface{}{
 				"query_duration": queryDuration.String(),
-				"result_count":   len(datasets),
 				"remote_addr":    r.RemoteAddr,
 			})
 		} else {
 			logger.DebugWithMetadata("Dataset query completed efficiently", map[string]interface{}{
 				"query_duration": queryDuration.String(),
-				"result_count":   len(datasets),
 				"remote_addr":    r.RemoteAddr,
 			})
 		}
 
 		// Audit log for public data access
 		logger.AuditLog(ctx, "dataset_list_accessed", "datasets", map[string]interface{}{
-			"result_count": len(datasets),
-			"page":         page,
-			"limit":        limit,
+			"page":  page,
+			"limit": limit,
 			"filters": map[string]string{
 				"search": searchTerm,
 				"domain": domain,
@@ -140,39 +156,19 @@ func listDataset(app *application.Application) httprouter.Handle {
 			"remote_addr": r.RemoteAddr,
 		})
 
-		// Prepare response
-		w.Header().Set("Content-Type", "application/json")
-
-		newResponse := apiresponse.New("success", "Datasets retrieved successfully")
-		dataResponse := newResponse.AddData(map[string]interface{}{
-			"datasets": datasets,
-			"pagination": map[string]interface{}{
-				"page":         page,
-				"limit":        limit,
-				"result_count": len(datasets),
-			},
-		})
-
-		response, err := dataResponse.Marshal()
-		if err != nil {
-			logger.ErrorWithMetadata("Failed to marshal dataset response", map[string]interface{}{
-				"result_count": len(datasets),
-				"remote_addr":  r.RemoteAddr,
-			}, err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
 		totalDuration := time.Since(start)
 
 		logger.InfoWithMetadata("Dataset list request completed successfully", map[string]interface{}{
-			"total_duration": totalDuration.String(),
-			"result_count":   len(datasets),
-			"response_size":  len(response),
 			"remote_addr":    r.RemoteAddr,
+			"total_duration": totalDuration.String(),
 		})
 
-		w.WriteHeader(http.StatusOK)
+		// IMPORTANT: Keep the exact same response format as original
+		w.Header().Set("Content-Type", "application/json")
+		newResponse := apiresponse.New("success", "List of all datasets")
+
+		dataResponse := newResponse.AddData(datasets)
+		response, _ := dataResponse.Marshal()
 		w.Write(response)
 	}
 }
