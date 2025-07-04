@@ -174,6 +174,8 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 			}
 
 			baseUrl := parsedUrl.Path + "/"
+			// Remove /lab/ from base URL for spawner lookup since JupyterHub stores base URLs without /lab
+			baseUrl = strings.TrimSuffix(baseUrl, "/lab/") + "/"
 			logger.DebugWithMetadata("Extracted base URL for spawner lookup", map[string]interface{}{
 				"build_id": buildId,
 				"base_url": baseUrl,
