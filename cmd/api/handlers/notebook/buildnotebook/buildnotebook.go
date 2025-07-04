@@ -96,11 +96,14 @@ func buildNotebook(app *application.Application) httprouter.Handle {
 		cookie := r.Header.Get("BuildToken")
 		buildUrl := app.Cfg.GetBinderNotebookBuildApi(notebook.RepoName)
 
-		logger.DebugWithMetadata("Notebook configuration prepared", map[string]interface{}{
-			"notebook_id": notebook.NotebookId,
-			"build_id":    notebook.BuildId,
-			"build_url":   buildUrl,
-			"has_cookie":  cookie != "",
+		logger.InfoWithMetadata("Notebook configuration prepared", map[string]interface{}{
+			"notebook_id":   notebook.NotebookId,
+			"build_id":      notebook.BuildId,
+			"build_url":     buildUrl,
+			"repo_name":     notebook.RepoName,
+			"has_cookie":    cookie != "",
+			"cookie_length": len(cookie),
+			"cookie_value":  cookie,
 		})
 
 		// Create notebook record

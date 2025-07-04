@@ -62,11 +62,16 @@ func (c *Config) GetAPIPort() string {
 }
 
 func (c *Config) GetBinderNotebookBuildApi(repoName string) string {
+	// Remove /hub/api suffix if present, as BinderHub build URLs should be at the root
+	binderHubBaseUrl := c.binderHubApi
+	if len(binderHubBaseUrl) > 8 && binderHubBaseUrl[len(binderHubBaseUrl)-8:] == "/hub/api" {
+		binderHubBaseUrl = binderHubBaseUrl[:len(binderHubBaseUrl)-8]
+	}
+
 	return fmt.Sprintf(
 		"%s/build/gh/datakaveri/%s/HEAD",
-		c.binderHubApi,
+		binderHubBaseUrl,
 		repoName,
-		// token,
 	)
 }
 

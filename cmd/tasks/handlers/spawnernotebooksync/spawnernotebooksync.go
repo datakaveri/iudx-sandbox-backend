@@ -39,16 +39,34 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 		"cookie_length": len(cookie),
 	})
 
-	// Log the exact parameters being used
-	logger.DebugWithMetadata("SSE connection parameters", map[string]interface{}{
+	// Log the exact parameters being used at INFO level to ensure we see them
+	logger.InfoWithMetadata("SSE connection parameters", map[string]interface{}{
 		"build_id":     buildId,
 		"build_url":    buildUrl,
-		"cookie_value": cookie, // Be careful with this in production
+		"cookie_value": cookie,
+		"user_id":      userId,
 	})
+
+	// Check for empty parameters
+	if buildUrl == "" {
+		err := fmt.Errorf("build URL is empty")
+		logger.ErrorWithMetadata("SSE connection failed - missing build URL", map[string]interface{}{
+			"build_id": buildId,
+			"user_id":  userId,
+		}, err)
+		return err
+	}
+
+	if cookie == "" {
+		logger.WarnWithMetadata("SSE connection starting without cookie", map[string]interface{}{
+			"build_id":  buildId,
+			"build_url": buildUrl,
+		})
+	}
 
 	sseClient := sse.NewClient(buildUrl, customHeader(cookie))
 
-	logger.DebugWithMetadata("SSE client created, starting subscription", map[string]interface{}{
+	logger.InfoWithMetadata("SSE client created, starting subscription", map[string]interface{}{
 		"build_id":  buildId,
 		"build_url": buildUrl,
 	})
@@ -63,7 +81,7 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 		timeSinceLastEvent := eventTime.Sub(lastEventTime)
 		lastEventTime = eventTime
 
-		logger.DebugWithMetadata("SSE event received", map[string]interface{}{
+		logger.InfoWithMetadata("SSE event received", map[string]interface{}{
 			"build_id":              buildId,
 			"event_count":           eventCount,
 			"time_since_last_event": timeSinceLastEvent.String(),
@@ -73,7 +91,7 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 		})
 
 		// Log raw event data for debugging
-		logger.DebugWithMetadata("Raw SSE event data", map[string]interface{}{
+		logger.InfoWithMetadata("Raw SSE event data", map[string]interface{}{
 			"build_id":   buildId,
 			"raw_data":   string(msg.Data),
 			"event_type": msg.Event,
