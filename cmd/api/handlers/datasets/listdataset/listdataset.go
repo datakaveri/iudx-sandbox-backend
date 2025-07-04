@@ -199,5 +199,5 @@ func listDataset(app *application.Application) httprouter.Handle {
 }
 
 func Do(app *application.Application) httprouter.Handle {
-	return middleware.Chain(listDataset(app), middleware.LogRequest, middleware.AuthorizeRequest)
+	return middleware.Chain(listDataset(app), middleware.LogRequest)
 }
