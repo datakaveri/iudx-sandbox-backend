@@ -50,7 +50,6 @@ func Get(app *application.Application) *httprouter.Router {
 	))
 	mux.GET("/api/notebooks/build-status", middleware.Chain(
 		notebookbuildstatus.Do(app),
-		middleware.AuthorizeRequest,
 	))
 	mux.POST("/api/notebooks", middleware.Chain(
 		buildnotebook.Do(app),
