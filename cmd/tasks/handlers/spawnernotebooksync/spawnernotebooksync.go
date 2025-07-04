@@ -3,6 +3,7 @@ package spawnernotebooksync
 import (
 	"context"
 	"crypto/tls"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -65,7 +66,7 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 	}
 
 	sseClient := sse.NewClient(buildUrl, customHeader(cookie))
-	
+
 	// Disable TLS certificate verification to handle self-signed or invalid certificates
 	sseClient.Connection.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -102,8 +103,16 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 			"event_type": msg.Event,
 		})
 
-		notebook := &models.Notebook{}
-		if err := json.Unmarshal(msg.Data, notebook); err != nil {
+		// Temporary struct for unmarshaling SSE event with string fields
+		var eventData struct {
+			Phase   string `json:"phase"`
+			Message string `json:"message"`
+			Image   string `json:"image"`
+			Token   string `json:"token"`
+			Url     string `json:"url"`
+		}
+
+		if err := json.Unmarshal(msg.Data, &eventData); err != nil {
 			logger.ErrorWithMetadata("Failed to unmarshal SSE event data", map[string]interface{}{
 				"build_id":    buildId,
 				"event_count": eventCount,
@@ -113,7 +122,14 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 			return
 		}
 
+		// Create notebook and map fields from eventData
+		notebook := &models.Notebook{}
 		notebook.BuildId = buildId
+		notebook.Phase = eventData.Phase
+		notebook.Message = eventData.Message
+		notebook.ImageName = eventData.Image
+		notebook.Token = sql.NullString{String: eventData.Token, Valid: eventData.Token != ""}
+		notebook.NotebookUrl = sql.NullString{String: eventData.Url, Valid: eventData.Url != ""}
 
 		logger.InfoWithMetadata("Notebook status update received", map[string]interface{}{
 			"build_id":     buildId,
