@@ -39,7 +39,6 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 		"cookie_length": len(cookie),
 	})
 
-	// Log the exact parameters being used at INFO level to ensure we see them
 	logger.InfoWithMetadata("SSE connection parameters", map[string]interface{}{
 		"build_id":     buildId,
 		"build_url":    buildUrl,
@@ -47,7 +46,6 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 		"user_id":      userId,
 	})
 
-	// Check for empty parameters
 	if buildUrl == "" {
 		err := fmt.Errorf("build URL is empty")
 		logger.ErrorWithMetadata("SSE connection failed - missing build URL", map[string]interface{}{
@@ -73,8 +71,9 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 
 	eventCount := 0
 	lastEventTime := time.Now()
+	done := make(chan struct{})
+	var sseErr error
 
-	// Use synchronous approach like the previous working implementation
 	sseserror := sseClient.SubscribeRaw(func(msg *sse.Event) {
 		eventCount++
 		eventTime := time.Now()
@@ -90,7 +89,6 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 			"event_id":              msg.ID,
 		})
 
-		// Log raw event data for debugging
 		logger.InfoWithMetadata("Raw SSE event data", map[string]interface{}{
 			"build_id":   buildId,
 			"raw_data":   string(msg.Data),
@@ -118,13 +116,21 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 			"ready":        notebook.Phase == "ready",
 		})
 
+		if notebook.Phase == "ready" || notebook.Phase == "failed" {
+			select {
+			case <-done:
+				// already closed
+			default:
+				close(done)
+			}
+		}
+
 		if notebook.Phase == "ready" {
 			logger.InfoWithMetadata("Notebook build completed - processing spawner ID", map[string]interface{}{
 				"build_id":     buildId,
 				"notebook_url": notebook.NotebookUrl.String,
 			})
 
-			// FIXME slightly inconsistent approach its unreliable maybe we can change spawner name but for single server that won't work
 			parsedUrl, err := url.Parse(notebook.NotebookUrl.String)
 			if err != nil {
 				logger.ErrorWithMetadata("Failed to parse notebook URL for spawner ID extraction", map[string]interface{}{
@@ -173,7 +179,6 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 			})
 		}
 
-		// Update notebook build status
 		if err := notebook.UpdateNotebookBuildStatus(app); err != nil {
 			logger.ErrorWithMetadata("Failed to update notebook build status", map[string]interface{}{
 				"build_id":    buildId,
@@ -202,13 +207,28 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 		return sseserror
 	}
 
-	logger.InfoWithMetadata("SSE connection completed successfully", map[string]interface{}{
+	// Wait for build to complete or timeout
+	select {
+	case <-done:
+		logger.InfoWithMetadata("SSE build completed for buildId", map[string]interface{}{
+			"build_id": buildId,
+		})
+	case <-time.After(2 * time.Minute):
+		logger.WarnWithMetadata("SSE build timed out for buildId", map[string]interface{}{
+			"build_id": buildId,
+		})
+		sseErr = fmt.Errorf("SSE build timed out")
+	}
+
+	duration = time.Since(start)
+
+	logger.InfoWithMetadata("SSE connection completed", map[string]interface{}{
 		"build_id":        buildId,
 		"duration":        duration.String(),
 		"events_received": eventCount,
 	})
 
-	return nil
+	return sseErr
 }
 
 // SpawnerNotebookSyncTaskHandler creates a task handler for spawner notebook sync
