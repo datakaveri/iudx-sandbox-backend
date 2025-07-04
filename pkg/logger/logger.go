@@ -232,6 +232,14 @@ func (l *Logger) formatSimple(entry LogEntry) string {
 		msg += " error=" + entry.Error
 	}
 
+	// Add metadata as JSON if present
+	if len(entry.Metadata) > 0 {
+		meta, err := json.Marshal(entry.Metadata)
+		if err == nil {
+			msg += " " + string(meta)
+		}
+	}
+
 	return msg
 }
 
