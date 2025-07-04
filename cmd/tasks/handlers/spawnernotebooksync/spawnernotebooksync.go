@@ -2,8 +2,10 @@ package spawnernotebooksync
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"time"
 
@@ -63,8 +65,13 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 	}
 
 	sseClient := sse.NewClient(buildUrl, customHeader(cookie))
+	
+	// Disable TLS certificate verification to handle self-signed or invalid certificates
+	sseClient.Connection.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
 
-	logger.InfoWithMetadata("SSE client created, starting subscription", map[string]interface{}{
+	logger.InfoWithMetadata("SSE client created with TLS verification disabled", map[string]interface{}{
 		"build_id":  buildId,
 		"build_url": buildUrl,
 	})
