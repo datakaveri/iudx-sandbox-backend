@@ -325,12 +325,12 @@ Commands to start the server
 ```shell
 helm repo add jupyterhub https://jupyterhub.github.io/helm-chart
 helm repo update
-helm install binder jupyterhub/binderhub --version=1.0.0-0.dev.git.3749.hf89ac98c --namespace=iudx-sandbox -f secret.yaml -f config-dev.yaml
+helm install binder jupyterhub/binderhub --version=1.0.0-0.dev.git.3462.hed366e4 --namespace=iudx-sandbox -f secret.yaml -f config-dev.yaml
 ```
 
 For prod
 ```shell
-helm install binder jupyterhub/binderhub --version=1.0.0-0.dev.git.3749.hf89ac98c --namespace=iudx-sandbox -f secret.yaml -f config-prod.yaml
+helm install binder jupyterhub/binderhub --version=1.0.0-0.dev.git.3462.hed366e4 --namespace=iudx-sandbox -f secret.yaml -f config-prod.yaml
 ```
 
 Replace the latest version from [here](https://jupyterhub.github.io/helm-chart/#development-releases-binderhub)
@@ -345,7 +345,7 @@ kubectl --namespace=iudx-sandbox get svc proxy-public
 
 Upgrade helm chart after updating config
 ```shell
-helm upgrade binder jupyterhub/binderhub --version=1.0.0-0.dev.git.3749.hf89ac98c --namespace=iudx-sandbox -f secret.yaml -f config-dev.yaml
+helm upgrade binder jupyterhub/binderhub --version=1.0.0-0.dev.git.3462.hed366e4 --namespace=iudx-sandbox -f secret.yaml -f config-dev.yaml
 ```
 
 You are good to go now. 

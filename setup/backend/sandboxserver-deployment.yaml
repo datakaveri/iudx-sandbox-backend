@@ -48,5 +48,8 @@ spec:
         ports:
         - containerPort: 8080
 
-      nodeSelector:
-        target.application: sandbox
+      tolerations:
+      - key: "target.application"
+        operator: "Equal"
+        value: "sandbox"
+        effect: "NoSchedule"

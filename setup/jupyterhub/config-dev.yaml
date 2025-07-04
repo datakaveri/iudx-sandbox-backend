@@ -182,7 +182,7 @@ jupyterhub:
       binder:
         oauth_no_confirm: true
         oauth_redirect_uri: http://localhost:3002/oauth_callback # update the host with binderhub url 
-        oauth_client_id: "playground-client"
+        oauth_client_id: "service-playground-client"
         admin: true
     db:
       type: postgres

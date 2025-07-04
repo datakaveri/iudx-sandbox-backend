@@ -155,7 +155,7 @@ jupyterhub:
       binder:
         oauth_no_confirm: true
         oauth_redirect_uri: https://playground.iudx.org.in/oauth_callback
-        oauth_client_id: "playground-client"
+        oauth_client_id: "service-playground-client"
         admin: true
     
     db:
@@ -273,16 +273,3 @@ dind:
     extraArgs:
       - --mtu
       - "1400"
-    # Node selector to control which nodes run DIND pods
-    nodeSelector:
-      node.kubernetes.io/instance-type: t3a.xlarge
-      # Add other labels as needed, e.g.:
-      # ssd: "true"
-      # worker-type: "build-nodes"
-    
-    # Tolerations to match your singleuser configuration
-    tolerations:
-      - key: "target.application"
-        operator: "Equal"
-        value: "sandbox"
-        effect: "NoSchedule"

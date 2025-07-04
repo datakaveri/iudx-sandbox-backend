@@ -72,7 +72,6 @@ func Get(app *application.Application) *httprouter.Router {
 	// Dataset endpoints - read operations for consumers, onboard operations use static API key
 	mux.GET("/api/datasets", middleware.Chain(
 		listdataset.Do(app),
-		middleware.RequireConsumerRole,
 	))
 	mux.POST("/api/dataset", middleware.Chain(
 		onboarddataset.Do(app),
@@ -80,13 +79,11 @@ func Get(app *application.Application) *httprouter.Router {
 	))
 	mux.GET("/api/dataset/:id", middleware.Chain(
 		getdataset.Do(app),
-		middleware.RequireConsumerRole,
 	))
 
 	// Resource endpoints - read operations for consumers, onboard operations use static API key
 	mux.GET("/api/resources/:id", middleware.Chain(
 		listresource.Do(app),
-		middleware.RequireConsumerRole,
 	))
 	mux.POST("/api/resource", middleware.Chain(
 		onboardresource.Do(app),
@@ -96,7 +93,6 @@ func Get(app *application.Application) *httprouter.Router {
 	// Reference resource endpoints - read operations for consumers, onboard operations use static API key
 	mux.GET("/api/referenceresources/:id", middleware.Chain(
 		listreferenceresource.Do(app),
-		middleware.RequireConsumerRole,
 	))
 	mux.POST("/api/referenceresource", middleware.Chain(
 		onboardreferenceresource.Do(app),
@@ -106,11 +102,9 @@ func Get(app *application.Application) *httprouter.Router {
 	// Metadata endpoints - read-only, require basic authentication
 	mux.GET("/api/tags", middleware.Chain(
 		listtags.Do(app),
-		middleware.AuthorizeRequest,
 	))
 	mux.GET("/api/domains", middleware.Chain(
 		listdomains.Do(app),
-		middleware.AuthorizeRequest,
 	))
 
 	return mux
