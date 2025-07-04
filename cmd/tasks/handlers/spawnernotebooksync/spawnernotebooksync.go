@@ -48,167 +48,143 @@ func buildNotebookSse(app *application.Application, buildUrl, cookie, buildId st
 
 	sseClient := sse.NewClient(buildUrl, customHeader(cookie))
 
-	logger.DebugWithMetadata("SSE client created", map[string]interface{}{
+	logger.DebugWithMetadata("SSE client created, starting subscription", map[string]interface{}{
 		"build_id":  buildId,
 		"build_url": buildUrl,
 	})
 
 	eventCount := 0
 	lastEventTime := time.Now()
-	connectionTimeout := 30 * time.Second
 
-	// Create a timeout channel
-	timeoutChan := time.After(connectionTimeout)
-	eventReceived := make(chan bool, 1)
+	// Use synchronous approach like the previous working implementation
+	sseserror := sseClient.SubscribeRaw(func(msg *sse.Event) {
+		eventCount++
+		eventTime := time.Now()
+		timeSinceLastEvent := eventTime.Sub(lastEventTime)
+		lastEventTime = eventTime
 
-	logger.InfoWithMetadata("Starting SSE subscription with timeout", map[string]interface{}{
-		"build_id": buildId,
-		"timeout":  connectionTimeout.String(),
-	})
+		logger.DebugWithMetadata("SSE event received", map[string]interface{}{
+			"build_id":              buildId,
+			"event_count":           eventCount,
+			"time_since_last_event": timeSinceLastEvent.String(),
+			"event_data_size":       len(msg.Data),
+			"event_type":            msg.Event,
+			"event_id":              msg.ID,
+		})
 
-	go func() {
-		sseClient.SubscribeRaw(func(msg *sse.Event) {
-			eventCount++
-			eventTime := time.Now()
-			timeSinceLastEvent := eventTime.Sub(lastEventTime)
-			lastEventTime = eventTime
+		// Log raw event data for debugging
+		logger.DebugWithMetadata("Raw SSE event data", map[string]interface{}{
+			"build_id":   buildId,
+			"raw_data":   string(msg.Data),
+			"event_type": msg.Event,
+		})
 
-			// Signal that we received an event
-			select {
-			case eventReceived <- true:
-			default:
-			}
+		notebook := &models.Notebook{}
+		if err := json.Unmarshal(msg.Data, notebook); err != nil {
+			logger.ErrorWithMetadata("Failed to unmarshal SSE event data", map[string]interface{}{
+				"build_id":    buildId,
+				"event_count": eventCount,
+				"raw_data":    string(msg.Data),
+				"data_size":   len(msg.Data),
+			}, err)
+			return
+		}
 
-			logger.DebugWithMetadata("SSE event received", map[string]interface{}{
-				"build_id":              buildId,
-				"event_count":           eventCount,
-				"time_since_last_event": timeSinceLastEvent.String(),
-				"event_data_size":       len(msg.Data),
-				"event_type":            msg.Event,
-				"event_id":              msg.ID,
+		notebook.BuildId = buildId
+
+		logger.InfoWithMetadata("Notebook status update received", map[string]interface{}{
+			"build_id":     buildId,
+			"phase":        notebook.Phase,
+			"notebook_url": notebook.NotebookUrl.String,
+			"event_count":  eventCount,
+			"ready":        notebook.Phase == "ready",
+		})
+
+		if notebook.Phase == "ready" {
+			logger.InfoWithMetadata("Notebook build completed - processing spawner ID", map[string]interface{}{
+				"build_id":     buildId,
+				"notebook_url": notebook.NotebookUrl.String,
 			})
 
-			// Log raw event data for debugging
-			logger.DebugWithMetadata("Raw SSE event data", map[string]interface{}{
-				"build_id":   buildId,
-				"raw_data":   string(msg.Data),
-				"event_type": msg.Event,
-			})
-
-			notebook := &models.Notebook{}
-			if err := json.Unmarshal(msg.Data, notebook); err != nil {
-				logger.ErrorWithMetadata("Failed to unmarshal SSE event data", map[string]interface{}{
-					"build_id":    buildId,
-					"event_count": eventCount,
-					"raw_data":    string(msg.Data),
-					"data_size":   len(msg.Data),
+			// FIXME slightly inconsistent approach its unreliable maybe we can change spawner name but for single server that won't work
+			parsedUrl, err := url.Parse(notebook.NotebookUrl.String)
+			if err != nil {
+				logger.ErrorWithMetadata("Failed to parse notebook URL for spawner ID extraction", map[string]interface{}{
+					"build_id":     buildId,
+					"notebook_url": notebook.NotebookUrl.String,
 				}, err)
 				return
 			}
 
-			notebook.BuildId = buildId
-
-			logger.InfoWithMetadata("Notebook status update received", map[string]interface{}{
-				"build_id":     buildId,
-				"phase":        notebook.Phase,
-				"notebook_url": notebook.NotebookUrl.String,
-				"event_count":  eventCount,
-				"ready":        notebook.Phase == "ready",
+			baseUrl := parsedUrl.Path + "/"
+			logger.DebugWithMetadata("Extracted base URL for spawner lookup", map[string]interface{}{
+				"build_id": buildId,
+				"base_url": baseUrl,
+				"user_id":  userId,
 			})
 
-			if notebook.Phase == "ready" {
-				logger.InfoWithMetadata("Notebook build completed - processing spawner ID", map[string]interface{}{
-					"build_id":     buildId,
-					"notebook_url": notebook.NotebookUrl.String,
-				})
-
-				// FIXME slightly inconsistent approach its unreliable maybe we can change spawner name but for single server that won't work
-				parsedUrl, err := url.Parse(notebook.NotebookUrl.String)
-				if err != nil {
-					logger.ErrorWithMetadata("Failed to parse notebook URL for spawner ID extraction", map[string]interface{}{
-						"build_id":     buildId,
-						"notebook_url": notebook.NotebookUrl.String,
-					}, err)
-					return
-				}
-
-				baseUrl := parsedUrl.Path + "/"
-				logger.DebugWithMetadata("Extracted base URL for spawner lookup", map[string]interface{}{
+			spawner := &models.Spawner{}
+			res, err := spawner.GetSpawnerIdBasedOnBaseUrl(app, baseUrl, userId)
+			if err != nil {
+				logger.ErrorWithMetadata("Failed to find spawner ID based on base URL", map[string]interface{}{
 					"build_id": buildId,
 					"base_url": baseUrl,
 					"user_id":  userId,
-				})
-
-				spawner := &models.Spawner{}
-				res, err := spawner.GetSpawnerIdBasedOnBaseUrl(app, baseUrl, userId)
-				if err != nil {
-					logger.ErrorWithMetadata("Failed to find spawner ID based on base URL", map[string]interface{}{
-						"build_id": buildId,
-						"base_url": baseUrl,
-						"user_id":  userId,
-					}, err)
-					return
-				}
-
-				notebook.SpawnerId = res.Id
-				logger.InfoWithMetadata("Spawner ID found and assigned", map[string]interface{}{
-					"build_id":   buildId,
-					"spawner_id": notebook.SpawnerId,
-					"base_url":   baseUrl,
-				})
-
-				if err := notebook.UpdateNotebookSpawnerId(app); err != nil {
-					logger.ErrorWithMetadata("Failed to update notebook spawner ID", map[string]interface{}{
-						"build_id":   buildId,
-						"spawner_id": notebook.SpawnerId,
-					}, err)
-					return
-				}
-
-				logger.InfoWithMetadata("Notebook spawner ID updated successfully", map[string]interface{}{
-					"build_id":   buildId,
-					"spawner_id": notebook.SpawnerId,
-				})
-			}
-
-			// Update notebook build status
-			if err := notebook.UpdateNotebookBuildStatus(app); err != nil {
-				logger.ErrorWithMetadata("Failed to update notebook build status", map[string]interface{}{
-					"build_id":    buildId,
-					"phase":       notebook.Phase,
-					"event_count": eventCount,
 				}, err)
 				return
 			}
 
-			logger.DebugWithMetadata("Notebook build status updated", map[string]interface{}{
+			notebook.SpawnerId = res.Id
+			logger.InfoWithMetadata("Spawner ID found and assigned", map[string]interface{}{
+				"build_id":   buildId,
+				"spawner_id": notebook.SpawnerId,
+				"base_url":   baseUrl,
+			})
+
+			if err := notebook.UpdateNotebookSpawnerId(app); err != nil {
+				logger.ErrorWithMetadata("Failed to update notebook spawner ID", map[string]interface{}{
+					"build_id":   buildId,
+					"spawner_id": notebook.SpawnerId,
+				}, err)
+				return
+			}
+
+			logger.InfoWithMetadata("Notebook spawner ID updated successfully", map[string]interface{}{
+				"build_id":   buildId,
+				"spawner_id": notebook.SpawnerId,
+			})
+		}
+
+		// Update notebook build status
+		if err := notebook.UpdateNotebookBuildStatus(app); err != nil {
+			logger.ErrorWithMetadata("Failed to update notebook build status", map[string]interface{}{
 				"build_id":    buildId,
 				"phase":       notebook.Phase,
 				"event_count": eventCount,
-			})
-		})
-	}()
+			}, err)
+			return
+		}
 
-	// Wait for either an event or timeout
-	select {
-	case <-eventReceived:
-		logger.InfoWithMetadata("First SSE event received, connection is working", map[string]interface{}{
-			"build_id": buildId,
+		logger.DebugWithMetadata("Notebook build status updated", map[string]interface{}{
+			"build_id":    buildId,
+			"phase":       notebook.Phase,
+			"event_count": eventCount,
 		})
-		// Continue processing events for a reasonable time
-		time.Sleep(2 * time.Minute) // Adjust based on expected build time
-	case <-timeoutChan:
-		logger.WarnWithMetadata("SSE connection timeout - no events received", map[string]interface{}{
-			"build_id":  buildId,
-			"timeout":   connectionTimeout.String(),
-			"build_url": buildUrl,
-		})
-		return fmt.Errorf("SSE connection timeout after %v", connectionTimeout)
-	}
+	})
 
 	duration := time.Since(start)
 
-	logger.InfoWithMetadata("SSE connection completed", map[string]interface{}{
+	if sseserror != nil {
+		logger.ErrorWithMetadata("SSE subscription failed", map[string]interface{}{
+			"build_id":        buildId,
+			"build_url":       buildUrl,
+			"duration":        duration.String(),
+			"events_received": eventCount,
+		}, sseserror)
+		return sseserror
+	}
+
+	logger.InfoWithMetadata("SSE connection completed successfully", map[string]interface{}{
 		"build_id":        buildId,
 		"duration":        duration.String(),
 		"events_received": eventCount,
