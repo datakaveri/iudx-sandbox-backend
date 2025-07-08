@@ -3,6 +3,7 @@ package tasks
 import (
 	"time"
 
+	"github.com/iudx-sandbox-backend/cmd/tasks/handlers/restartnotebook"
 	"github.com/iudx-sandbox-backend/cmd/tasks/handlers/spawnernotebooksync"
 	"github.com/iudx-sandbox-backend/pkg/application"
 	"github.com/iudx-sandbox-backend/pkg/logger"
@@ -11,6 +12,7 @@ import (
 func StartTask(app *application.Application) {
 	// Register task handlers
 	spawnernotebooksync.RegisterTask(app)
+	restartnotebook.RegisterTask(app)
 
 	// Start monitoring goroutine for task queue statistics
 	go func() {
