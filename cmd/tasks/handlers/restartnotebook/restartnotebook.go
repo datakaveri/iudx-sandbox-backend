@@ -2,9 +2,11 @@ package restartnotebook
 
 import (
 	"context"
+	"crypto/tls"
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -54,7 +56,12 @@ func handleRestartSse(app *application.Application, progressUrl, buildId string,
 
 	sseClient := sse.NewClient(progressUrl, customHeader(app))
 
-	logger.InfoWithMetadata("SSE client created for restart", map[string]interface{}{
+	// Disable TLS certificate verification to handle self-signed or invalid certificates
+	sseClient.Connection.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	logger.InfoWithMetadata("SSE client created for restart with TLS verification disabled", map[string]interface{}{
 		"build_id":     buildId,
 		"progress_url": progressUrl,
 	})
@@ -63,6 +70,11 @@ func handleRestartSse(app *application.Application, progressUrl, buildId string,
 	lastEventTime := time.Now()
 	done := make(chan struct{})
 	var sseErr error
+
+	logger.InfoWithMetadata("Attempting to subscribe to SSE events for restart", map[string]interface{}{
+		"build_id":     buildId,
+		"progress_url": progressUrl,
+	})
 
 	sseserror := sseClient.SubscribeRaw(func(msg *sse.Event) {
 		eventCount++
@@ -163,6 +175,12 @@ func handleRestartSse(app *application.Application, progressUrl, buildId string,
 		})
 	})
 
+	logger.InfoWithMetadata("SSE subscription attempt completed", map[string]interface{}{
+		"build_id":     buildId,
+		"progress_url": progressUrl,
+		"has_error":    sseserror != nil,
+	})
+
 	duration := time.Since(start)
 
 	if sseserror != nil {
@@ -171,24 +189,41 @@ func handleRestartSse(app *application.Application, progressUrl, buildId string,
 			"progress_url":    progressUrl,
 			"duration":        duration.String(),
 			"events_received": eventCount,
+			"error_message":   sseserror.Error(),
 		}, sseserror)
 		return sseserror
 	}
+
+	logger.InfoWithMetadata("SSE subscription started successfully, waiting for events", map[string]interface{}{
+		"build_id":     buildId,
+		"progress_url": progressUrl,
+	})
 
 	// Wait for restart to complete or timeout
 	select {
 	case <-done:
 		logger.InfoWithMetadata("SSE restart completed for buildId", map[string]interface{}{
-			"build_id": buildId,
+			"build_id":        buildId,
+			"events_received": eventCount,
 		})
 	case <-time.After(2 * time.Minute):
 		logger.WarnWithMetadata("SSE restart timed out for buildId", map[string]interface{}{
-			"build_id": buildId,
+			"build_id":        buildId,
+			"events_received": eventCount,
+			"progress_url":    progressUrl,
 		})
-		sseErr = fmt.Errorf("SSE restart timed out")
+		sseErr = fmt.Errorf("SSE restart timed out after 2 minutes, received %d events", eventCount)
 	}
 
 	duration = time.Since(start)
+
+	if eventCount == 0 {
+		logger.InfoWithMetadata("No SSE events received during restart", map[string]interface{}{
+			"build_id":     buildId,
+			"progress_url": progressUrl,
+			"duration":     duration.String(),
+		})
+	}
 
 	logger.InfoWithMetadata("SSE restart connection completed", map[string]interface{}{
 		"build_id":        buildId,
