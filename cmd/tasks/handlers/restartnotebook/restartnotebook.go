@@ -142,10 +142,38 @@ func handleRestartSse(app *application.Application, progressUrl, buildId string,
 			}
 
 			notebook.Phase = "ready"
-			// Set notebook URL for ready state - ensure it has /lab suffix
-			notebookUrl := response.Url
-			if notebookUrl != "" {
-				notebookUrl = strings.TrimSuffix(notebookUrl, "/") + "/lab"
+			// Construct full notebook URL from JupyterHub base URL and relative path
+			notebookUrl := ""
+			if response.Url != "" {
+				// Get JupyterHub API base URL (e.g., "https://hub.playground.iudx.org.in/hub/api")
+				jupyterHubApiUrl := app.Cfg.GetJupyterHubApi()
+
+				// Remove /hub/api suffix to get the base URL
+				baseUrl := jupyterHubApiUrl
+				if len(baseUrl) >= 8 && baseUrl[len(baseUrl)-8:] == "/hub/api" {
+					baseUrl = baseUrl[:len(baseUrl)-8]
+				}
+
+				// Ensure response.Url starts with /
+				relativeUrl := response.Url
+				if !strings.HasPrefix(relativeUrl, "/") {
+					relativeUrl = "/" + relativeUrl
+				}
+
+				// Remove /lab suffix if present to avoid duplication
+				relativeUrl = strings.TrimSuffix(relativeUrl, "/lab")
+
+				// Construct full URL: baseUrl + relativeUrl + /lab
+				notebookUrl = baseUrl + relativeUrl + "/lab"
+
+				logger.InfoWithMetadata("Constructed full notebook URL for restart", map[string]interface{}{
+					"build_id":           buildId,
+					"original_url":       response.Url,
+					"jupyter_api_url":    jupyterHubApiUrl,
+					"base_url":           baseUrl,
+					"relative_url":       relativeUrl,
+					"final_notebook_url": notebookUrl,
+				})
 			}
 			notebook.NotebookUrl = sql.NullString{String: notebookUrl, Valid: notebookUrl != ""}
 
