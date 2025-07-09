@@ -114,6 +114,7 @@ jupyterhub:
       GenericOAuthenticator:
         auto_login: true
         enable_auth_state: true
+        allow_all: true
         authorize_url: https://keycloak.iudx.org.in/auth/realms/iudx/protocol/openid-connect/auth
         client_id: angular-iudx-client
         login_service: keycloak
@@ -157,6 +158,18 @@ jupyterhub:
         oauth_redirect_uri: https://playground.iudx.org.in/oauth_callback
         oauth_client_id: "service-playground-client"
         admin: true
+
+    loadRoles:
+      binder:
+        scopes:
+          - servers
+          - admin:users
+        services:
+          - binder
+      user:
+        scopes:
+          - self
+          - "access:services"
     
     db:
       type: postgres
