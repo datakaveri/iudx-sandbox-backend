@@ -25,7 +25,7 @@ config:
     extra_static_url_prefix: /extra_static/
     template_variables:
       EXTRA_STATIC_URL_PREFIX: "/extra_static/"
-    appendix: RUN pip install tqdm fastparquet pandas numpy statsmodels scikit-learn scipy folium geojsoncontour seaborn ipywidgets plotly h3 datetime keplergl supervisor voila ipyvuetify voila-vuetify bqplot matplotlib git+https://github.com/datakaveri/iudx-python-sdk geopandas rasterio xarray rioxarray xarray_leaflet
+    appendix: RUN pip install tqdm fastparquet pandas numpy statsmodels scikit-learn scipy folium geojsoncontour seaborn ipywidgets plotly h3 datetime keplergl supervisor voila ipyvuetify voila-vuetify bqplot matplotlib git+https://github.com/datakaveri/iudx-python-sdk geopandas rasterio xarray rioxarray xarray_leaflet h5netcdf
   GithubRepoProvider:
     # Add banned repositories to the list below
     # They should be strings that will match "^<org-name>/<repo-name>.*"
@@ -98,11 +98,11 @@ jupyterhub:
         mountPath: /usr/local/etc/jupyterhub/persistent_bhub_config.py
         subPath: persistent_bhub_config.py
     
-#    tolerations:
-#      - key: "target.application"
-#        operator: "Equal"
-#        value: "sandbox"
-#        effect: "NoSchedule"    
+    tolerations:
+      - key: "target.application"
+        operator: "Equal"
+        value: "sandbox"
+        effect: "NoSchedule"    
 
     redirectToServer: false
     allowNamedServers: true
@@ -155,7 +155,7 @@ jupyterhub:
       binder:
         oauth_no_confirm: true
         oauth_redirect_uri: https://playground.iudx.org.in/oauth_callback
-        oauth_client_id: "playground-client"
+        oauth_client_id: "service-playground-client"
         admin: true
     
     db:
@@ -180,7 +180,7 @@ jupyterhub:
     storage:
       type: dynamic
       dynamic:
-        storageClass: efs-storage-class
+        storageClass: ebs-csi-storage-class
         pvcNameTemplate: "jpvc-{userid}-{servername}"
         volumeNameTemplate: "jvlm-{userid}-{servername}"
       capacity: 2Gi
@@ -261,8 +261,11 @@ extraConfig:
 imageCleaner:
   enabled: false
 
+imageBuilderType: dind
+
 dind:
-  enabled: true
+  hostLibDir: /var/lib/dind/iudx-sandbox
+  hostSocketDir: /var/lib/dind/iudx-sandbox
   daemonset:
     image:
       name: docker

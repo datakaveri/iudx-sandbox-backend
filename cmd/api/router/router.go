@@ -1,6 +1,8 @@
 package router
 
 import (
+	"net/http"
+
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/getdataset"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/listdataset"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/datasets/listdomains"
@@ -17,31 +19,92 @@ import (
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/resources/listresource"
 	"github.com/iudx-sandbox-backend/cmd/api/handlers/resources/onboardresource"
 	"github.com/iudx-sandbox-backend/pkg/application"
+	"github.com/iudx-sandbox-backend/pkg/health"
+	"github.com/iudx-sandbox-backend/pkg/middleware"
 	"github.com/julienschmidt/httprouter"
 )
 
 func Get(app *application.Application) *httprouter.Router {
 	mux := httprouter.New()
 
-	mux.GET("/api/notebooks", listnotebook.Do(app))
-	mux.GET("/api/notebooks/build-status", notebookbuildstatus.Do(app))
-	mux.POST("/api/notebooks", buildnotebook.Do(app))
-	mux.DELETE("/api/notebooks", deletenotebook.Do(app))
-	mux.GET("/api/notebooks/stop", stopnotebook.Do(app))
-	mux.GET("/api/notebooks/start", restartnotebook.Do(app))
+	// Initialize health manager and checks
+	healthManager := health.NewHealthManager("1.0.0") // TODO: get version from build
+	healthManager.RegisterChecker("database", health.NewDatabaseChecker(app.DB.Client))
+	healthManager.RegisterChecker("task_queue", health.NewTaskQueueChecker(app.TaskQueue))
 
-	mux.GET("/api/datasets", listdataset.Do(app))
-	mux.POST("/api/dataset", onboarddataset.Do(app))
-	mux.GET("/api/dataset/:id", getdataset.Do(app))
+	// Health check endpoints (public, no authentication required)
+	mux.GET("/health", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		healthManager.HTTPHandler()(w, r)
+	})
+	mux.GET("/health/ready", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		healthManager.ReadinessHandler()(w, r)
+	})
+	mux.GET("/health/live", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		healthManager.LivenessHandler()(w, r)
+	})
 
-	mux.GET("/api/resources/:id", listresource.Do(app))
-	mux.POST("/api/resource", onboardresource.Do(app))
+	// Notebook endpoints - require authentication for all operations
+	mux.GET("/api/notebooks", middleware.Chain(
+		listnotebook.Do(app),
+		middleware.AuthorizeRequest,
+	))
+	mux.GET("/api/notebooks/build-status", middleware.Chain(
+		notebookbuildstatus.Do(app),
+	))
+	mux.POST("/api/notebooks", middleware.Chain(
+		buildnotebook.Do(app),
+		middleware.AuthorizeRequest,
+	))
+	mux.DELETE("/api/notebooks", middleware.Chain(
+		deletenotebook.Do(app),
+		middleware.AuthorizeRequest,
+	))
+	mux.GET("/api/notebooks/stop", middleware.Chain(
+		stopnotebook.Do(app),
+		middleware.AuthorizeRequest,
+	))
+	mux.GET("/api/notebooks/start", middleware.Chain(
+		restartnotebook.Do(app),
+		middleware.AuthorizeRequest,
+	))
 
-	mux.GET("/api/referenceresources/:id", listreferenceresource.Do(app))
-	mux.POST("/api/referenceresource", onboardreferenceresource.Do(app))
+	// Dataset endpoints - read operations for consumers, onboard operations use static API key
+	mux.GET("/api/datasets", middleware.Chain(
+		listdataset.Do(app),
+	))
+	mux.POST("/api/dataset", middleware.Chain(
+		onboarddataset.Do(app),
+		middleware.AuthorizeStaticAPIKey, // Service-to-service authentication
+	))
+	mux.GET("/api/dataset/:id", middleware.Chain(
+		getdataset.Do(app),
+	))
 
-	mux.GET("/api/tags", listtags.Do(app))
-	mux.GET("/api/domains", listdomains.Do(app))
+	// Resource endpoints - read operations for consumers, onboard operations use static API key
+	mux.GET("/api/resources/:id", middleware.Chain(
+		listresource.Do(app),
+	))
+	mux.POST("/api/resource", middleware.Chain(
+		onboardresource.Do(app),
+		middleware.AuthorizeStaticAPIKey, // Service-to-service authentication
+	))
+
+	// Reference resource endpoints - read operations for consumers, onboard operations use static API key
+	mux.GET("/api/referenceresources/:id", middleware.Chain(
+		listreferenceresource.Do(app),
+	))
+	mux.POST("/api/referenceresource", middleware.Chain(
+		onboardreferenceresource.Do(app),
+		middleware.AuthorizeStaticAPIKey, // Service-to-service authentication
+	))
+
+	// Metadata endpoints - read-only, require basic authentication
+	mux.GET("/api/tags", middleware.Chain(
+		listtags.Do(app),
+	))
+	mux.GET("/api/domains", middleware.Chain(
+		listdomains.Do(app),
+	))
 
 	return mux
 }

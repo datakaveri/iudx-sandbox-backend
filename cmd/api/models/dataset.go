@@ -2,6 +2,8 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
 
 	"github.com/iudx-sandbox-backend/pkg/application"
 	"github.com/iudx-sandbox-backend/pkg/logger"
@@ -168,4 +170,70 @@ func (g *Dataset) GetDataset(app *application.Application, unique_id string) (Da
 	}
 
 	return dataset, nil
+}
+
+func (g *Dataset) GetAll(app *application.Application, page, limit int, searchTerm, domain, tag string) ([]DatasetResponse, error) {
+	whereClause := "WHERE 1=1"
+	args := []interface{}{}
+	argCount := 0
+
+	// Add search term filter
+	if searchTerm != "" {
+		argCount++
+		whereClause += " AND (LOWER(name) LIKE $" + fmt.Sprintf("%d", argCount) + " OR LOWER(description) LIKE $" + fmt.Sprintf("%d", argCount) + ")"
+		args = append(args, "%"+strings.ToLower(searchTerm)+"%")
+	}
+
+	// Add domain filter
+	if domain != "" {
+		argCount++
+		whereClause += " AND LOWER(domain) = $" + fmt.Sprintf("%d", argCount)
+		args = append(args, strings.ToLower(domain))
+	}
+
+	// Add tag filter
+	if tag != "" {
+		argCount++
+		whereClause += " AND $" + fmt.Sprintf("%d", argCount) + " = ANY(tags)"
+		args = append(args, tag)
+	}
+
+	// Add pagination
+	offset := (page - 1) * limit
+	argCount++
+	limitClause := " LIMIT $" + fmt.Sprintf("%d", argCount)
+	args = append(args, limit)
+
+	argCount++
+	offsetClause := " OFFSET $" + fmt.Sprintf("%d", argCount)
+	args = append(args, offset)
+
+	stmt := `SELECT * FROM dataset ` + whereClause + ` ORDER BY name` + limitClause + offsetClause
+
+	rows, err := app.DB.Client.Query(stmt, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	datasets := []DatasetResponse{}
+	for rows.Next() {
+		var dataset DatasetResponse
+		err := rows.Scan(
+			&dataset.Id, &dataset.AccessPolicy,
+			&dataset.Description, &dataset.Domain, &dataset.Icon,
+			pq.Array(&dataset.IUDXResourceAPIs), &dataset.Label,
+			&dataset.Name, &dataset.Provider,
+			&dataset.RepositoryURL,
+			pq.Array(&dataset.Tags),
+			pq.Array(&dataset.Type), &dataset.Unique_id,
+			&dataset.Resources, &dataset.Instance)
+
+		if err != nil {
+			return nil, err
+		}
+		datasets = append(datasets, dataset)
+	}
+
+	return datasets, rows.Err()
 }

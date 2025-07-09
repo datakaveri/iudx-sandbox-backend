@@ -12,7 +12,7 @@ networks:
 
 services:
   prod:
-    image: iudx/sandbox-backend-prod:latest
+    image: private-registry.iudx.org.in/sandbox-backend-prod:latest
     container_name: sandbox-backend-prod
     env_file:
       - .env
@@ -26,7 +26,7 @@ services:
       - sandbox-net
 
   dev:
-    image: iudx/sandbox-backend-dev:latest
+    image: private-registry.iudx.org.in/sandbox-backend-dev:latest
     container_name: sandbox-backend-dev
     env_file:
       - .env
@@ -39,7 +39,7 @@ services:
     entrypoint: ["/bin/sh", "./scripts/entrypoint.dev.sh"]
 
   test:
-    image: iudx/sandbox-backend-test:latest
+    image: private-registry.iudx.org.in/sandbox-backend-test:latest
     container_name: sandbox-backend-test
     env_file:
       - .env

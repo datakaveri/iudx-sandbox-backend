@@ -2,6 +2,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: persistent-bhub-config
+  namespace: iudx-sandbox
 data:
   persistent_bhub_config.py: |-
     import json
@@ -13,8 +14,7 @@ data:
 
     import z2jh
     from jupyterhub.apihandlers.base import APIHandler
-    from jupyterhub.apihandlers.users import admin_or_self
-    from jupyterhub.utils import admin_only
+    from jupyterhub.scopes import needs_scope
     from kubespawner import KubeSpawner
     from tornado import web
     from traitlets import List
@@ -365,7 +365,7 @@ data:
     class ProjectAPIHandler(APIHandler):
         """A JupyterHub API handler to manage user projects."""
 
-        @admin_only
+        @needs_scope('admin:users')
         async def get(self, user_name):
             """Takes a user name and returns projects of that user."""
             # get user's projects
@@ -375,7 +375,7 @@ data:
             projects = {"projects": user.spawner.get_state_field("projects")}
             self.write(json.dumps(projects))
 
-        @admin_or_self
+        @needs_scope('admin:users', 'self')
         async def delete(self, user_name):
             """Deletes a project from state["projects"] and adds it into state["deleted_projects"]
             in `spawners` table in database. It doesn't delete project files on disk (user storage),

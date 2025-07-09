@@ -1,6 +1,7 @@
 package httputility
 
 import (
+	"crypto/tls"
 	"io"
 	"io/ioutil"
 	"log"
@@ -17,7 +18,16 @@ const (
 )
 
 func Get() *HttpClient {
-	client := &http.Client{Timeout: time.Duration(RequestTimeout) * time.Second}
+	// Create a custom transport that skips TLS certificate verification
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	client := &http.Client{
+		Timeout:   time.Duration(RequestTimeout) * time.Second,
+		Transport: tr,
+	}
+
 	return &HttpClient{
 		httpClient: client,
 	}

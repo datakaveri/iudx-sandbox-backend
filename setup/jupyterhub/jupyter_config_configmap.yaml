@@ -2,6 +2,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: jupyter-config
+  namespace: iudx-sandbox
 data:
   jupyter_config.json: |-
     {

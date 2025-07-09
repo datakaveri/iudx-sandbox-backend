@@ -11,17 +11,17 @@ import (
 type Notebook struct {
 	UserId       int
 	SpawnerId    int
-	NotebookId   string `json:"notebookId"`
-	NotebookName string `json:"name"`
-	NotebookUrl  string `json:"url"`
-	RepoName     string `json:"repoName"`
-	BuildId      string `json:"buildId"`
-	Phase        string `json:"phase"`
-	Message      string `json:"message"`
-	Token        string `json:"token"`
-	ImageName    string `json:"imageName"`
-	CreatedAt    string `json:"createdAt"`
-	LastUsed     string `json:"lastUsed"`
+	NotebookId   string         `json:"notebookId"`
+	NotebookName string         `json:"name"`
+	NotebookUrl  sql.NullString `json:"url"`
+	RepoName     string         `json:"repoName"`
+	BuildId      string         `json:"buildId"`
+	Phase        string         `json:"phase"`
+	Message      string         `json:"message"`
+	Token        sql.NullString `json:"token"`
+	ImageName    string         `json:"imageName"`
+	CreatedAt    string         `json:"createdAt"`
+	LastUsed     string         `json:"lastUsed"`
 }
 
 type BuildStatusResponse struct {
@@ -36,16 +36,16 @@ type NotebookResponse struct {
 	UserId       int
 	ServerId     sql.NullInt64
 	SpawnerId    sql.NullInt64
-	SpawnerName  string
+	SpawnerName  sql.NullString
 	NotebookId   string
 	NotebookName string
-	NotebookUrl  string
+	NotebookUrl  sql.NullString
 	RepoName     string
-	Token        string
+	Token        sql.NullString
 	Status       string
 	BuildId      string
 	CreatedAt    string
-	LastUsed     string
+	LastUsed     sql.NullString
 }
 
 func (g *Notebook) Create(app *application.Application) error {
@@ -268,15 +268,18 @@ func (g *Notebook) GetSpawnerName(app *application.Application, userId int, note
 		WHERE notebook."userId" = $1 AND notebook."notebookId" =$2;
 	`
 
-	notebook := NotebookResponse{}
+	var spawnerName sql.NullString
 	result := app.DB.Client.QueryRow(stmt, userId, notebookId)
 
-	err := result.Scan(&notebook.RepoName)
+	err := result.Scan(&spawnerName)
 	if err != nil {
 		return "", err
 	}
 
-	return notebook.RepoName, nil
+	if spawnerName.Valid {
+		return spawnerName.String, nil
+	}
+	return "", nil
 }
 
 func (g *Notebook) RemoveSpawnerId(app *application.Application) error {

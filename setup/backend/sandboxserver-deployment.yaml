@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sandboxserver-deployment
-  namespace: binder
+  namespace: iudx-sandbox
 spec:
   selector:
     matchLabels:
@@ -12,12 +12,16 @@ spec:
       labels:
         app: sandboxserver
     spec:
+      imagePullSecrets:
+      - name: image-pull-secret
       containers:
       - name: sandboxserver-container
-        image: datakaveri/sandbox-backend:latest
+        image: private-registry.iudx.org.in/sandbox-backend-dev:latest
         imagePullPolicy: Always
 
         env:
+          - name: LOG_LEVEL
+            value: DEBUG
           - name: GO_ENV
             value: prod
           - name: API_PORT
@@ -40,11 +44,14 @@ spec:
             value: <token>
           - name: KEYCLOAK_PUBLIC_KEY
             value: <key>
+          - name: STATIC_API_KEY
+            value: <some-strong-value>
 
         ports:
         - containerPort: 8080
-        command: ["/bin/sh"]
-        args: ["./scripts/entrypoint.dev.sh"]
 
-      nodeSelector:
-        target.application: sandbox
+      tolerations:
+      - key: "target.application"
+        operator: "Equal"
+        value: "sandbox"
+        effect: "NoSchedule"
