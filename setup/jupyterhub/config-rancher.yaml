@@ -114,6 +114,7 @@ jupyterhub:
       GenericOAuthenticator:
         auto_login: true
         enable_auth_state: true
+        allow_all: true
         authorize_url: https://keycloak.iudx.org.in/auth/realms/iudx/protocol/openid-connect/auth
         client_id: angular-iudx-client
         login_service: keycloak
@@ -157,6 +158,18 @@ jupyterhub:
         oauth_redirect_uri: https://playground.iudx.org.in/oauth_callback
         oauth_client_id: "service-playground-client"
         admin: true
+
+    loadRoles:
+      binder:
+        scopes:
+          - servers
+          - admin:users
+        services:
+          - binder
+      user:
+        scopes:
+          - self
+          - "access:services"
     
     db:
       type: postgres
@@ -261,6 +274,21 @@ extraConfig:
 imageCleaner:
   enabled: false
 
+# Alternative: Use Kaniko builder instead of DinD
+# Uncomment the following lines and comment out the dind section above if issues persist
+# imageBuilderType: kaniko
+# kaniko:
+#   image:
+#     name: gcr.io/kaniko-project/executor
+#     tag: v1.9.0
+#   resources:
+#     requests:
+#       memory: 512Mi
+#       cpu: 500m
+#     limits:
+#       memory: 2Gi
+#       cpu: 1000m
+
 imageBuilderType: dind
 
 dind:
@@ -269,7 +297,7 @@ dind:
   daemonset:
     image:
       name: docker
-      tag: 23.0.1-dind
+      tag: 24.0.7-dind  # Updated to newer version
     extraArgs:
       - --mtu
       - "1400"
