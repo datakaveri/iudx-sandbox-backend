@@ -41,11 +41,9 @@ RUN python3 -m pip install --no-cache-dir \
     notebook \
     jupyterlab \
     jupyterhub \
-    numpy \
     scipy \
     matplotlib \
     pandas \
-    gdal==3.6.2 \
     geopandas \
     rasterio \
     folium \
@@ -59,13 +57,37 @@ RUN python3 -m pip install --no-cache-dir \
     dash-leaflet \
     git+https://github.com/datakaveri/gdi-python-sdk.git
 
+RUN pip install --no-cache-dir --force-reinstall \
+    gdal[numpy]==3.6.2
+
+RUN pip install --no-cache-dir --force-reinstall numpy==1.26.4
+
+# Create WhiteboxTools directory and set proper permissions
+# This handles both current installation and future installations in downstream images
+RUN mkdir -p /usr/local/lib/python3.12/site-packages/whitebox && \
+    chown -R ${NB_UID}:${NB_UID} /usr/local/lib/python3.12/site-packages/whitebox && \
+    chmod -R 755 /usr/local/lib/python3.12/site-packages/whitebox
+
+# Create a helper script for downstream images to fix WhiteboxTools permissions
+RUN echo '#!/bin/bash' > /usr/local/bin/fix-whitebox-permissions.sh && \
+    echo 'chown -R ${NB_UID}:${NB_UID} /usr/local/lib/python3.12/site-packages/whitebox/ 2>/dev/null || true' >> /usr/local/bin/fix-whitebox-permissions.sh && \
+    echo 'chmod -R 755 /usr/local/lib/python3.12/site-packages/whitebox/ 2>/dev/null || true' >> /usr/local/bin/fix-whitebox-permissions.sh && \
+    echo 'echo "WhiteboxTools permissions fixed."' >> /usr/local/bin/fix-whitebox-permissions.sh && \
+    chmod +x /usr/local/bin/fix-whitebox-permissions.sh
+
+# Pre-download WhiteboxTools binary as jovyan user to ensure proper ownership
+USER ${NB_USER}
+RUN python3 -c "import whitebox; whitebox.download_wbt()" || true
+
+# Switch back to root for remaining setup
+USER root
+
 # Set environment variables for GDAL
 ENV GDAL_DATA=/usr/share/gdal
 ENV PROJ_LIB=/usr/share/proj
 
 # Copy repository contents to HOME and set ownership (BinderHub requirement)
 COPY . ${HOME}
-USER root
 RUN chown -R ${NB_UID} ${HOME}
 
 # Switch to non-root user
